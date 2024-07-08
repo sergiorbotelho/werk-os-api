@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+  name String @db.VarChar(255) @unique
+  email String @db.VarChar(255)
+  password String @db.VarChar(255)
+  created_at DateTime? @default(now())
+  update_at DateTime?  @updatedAt
+
+  @@map("users")
+}
+
+model Client{
+  id String @id @default(uuid())
+  nome String @db.VarChar(255)
+  telefone Int
+  cpf String @db.VarChar(11)
+  cnpj String @db.VarChar(14)
+  cep String @db.VarChar(8)
+  endereco String @db.VarChar(255)
+  numero String @db.VarChar(20)
+  bairro String @db.VarChar(255)
+  cidade String @db.VarChar(150)
+  uf String @db.VarChar(2)
+  created_at DateTime? @default(now())
+  update_at DateTime?  @updatedAt
+
+  @@map("clients")
+  os Os[]
+}
+
+model Os{
+  id String @id @default(uuid())
+  modeloEquipamento String
+  defeito String
+  defeitoConstatado String
+  solucao String
+  valServico Decimal @db.Decimal(30,2)
+  valMaterial Decimal @db.Decimal(30,2)
+  total Decimal @db.Decimal(30,2)
+  garantiaPeca String
+  garantiaServico String
+  numero Int @default(autoincrement())
+
+  client Client @relation(fields: [client_id], references: [id])
+  tipoServico TipoServico?
+  @@map("os")
+  client_id String
+}
+
+model TipoServico{
+  id Int @id @default(autoincrement())
+  descricao String
+  status Boolean @default(false)
+  os Os @relation(fields: [tipoServico_id], references: [id])
+  @@map("tipo_servico")
+  tipoServico_id String @unique
+}
