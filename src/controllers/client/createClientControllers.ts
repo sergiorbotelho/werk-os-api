@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { CreateClientService } from "../../services/client/createClientService";
 
-export class createClientController {
+export class CreateClientController {
   async handle(req: Request, res: Response) {
     const {
       nome,
