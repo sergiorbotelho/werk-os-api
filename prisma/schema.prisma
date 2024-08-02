@@ -13,10 +13,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TipoServico {
+  GARANTIA
+  FORADEGARANTIA
+  ORCAMENTO
+  CONTRATO
+}
 model User {
   id String @id @default(uuid())
-  name String @db.VarChar(255) @unique
-  email String @db.VarChar(255)
+  name String @db.VarChar(255) 
+  email String @db.VarChar(255) @unique
   password String @db.VarChar(255)
   created_at DateTime? @default(now())
   update_at DateTime?  @updatedAt
@@ -55,18 +61,9 @@ model Os{
   garantiaPeca String
   garantiaServico String
   numero Int @default(autoincrement())
-
   client Client @relation(fields: [client_id], references: [id])
-  tipoServico TipoServico?
+  tipoServico TipoServico @default(FORADEGARANTIA)
   @@map("os")
   client_id String
 }
 
-model TipoServico{
-  id Int @id @default(autoincrement())
-  descricao String
-  status Boolean @default(false)
-  os Os @relation(fields: [tipoServico_id], references: [id])
-  @@map("tipo_servico")
-  tipoServico_id String @unique
-}
