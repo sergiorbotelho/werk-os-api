@@ -1,17 +1,5 @@
+import { Prisma } from "@prisma/client";
 import prismaClient from "../../prisma";
-
-interface RequestProps {
-  nome: string;
-  telefone: string;
-  cpf: string;
-  cnpj: string;
-  cep: string;
-  endereco: string;
-  numero: string;
-  bairro: string;
-  cidade: string;
-  uf: string;
-}
 
 export class CreateClientService {
   async execute({
@@ -25,7 +13,7 @@ export class CreateClientService {
     bairro,
     cidade,
     uf,
-  }: RequestProps) {
+  }: Prisma.ClientCreateInput) {
     if (nome.trim().length === 0) {
       throw new Error("Nome inválido");
     }

@@ -6,7 +6,7 @@ interface RequestProps {
   defeitoConstatado: string;
   solucao: string;
   valServico: number;
-  valeMaterial: number;
+  valMaterial: number;
   garantiaPeca: string;
   garantiaServico: string;
   cliente_id: string;
@@ -19,7 +19,7 @@ export class CreateOsService {
     defeitoConstatado,
     solucao,
     valServico,
-    valeMaterial,
+    valMaterial,
     garantiaPeca,
     garantiaServico,
     cliente_id,
@@ -31,8 +31,8 @@ export class CreateOsService {
         defeitoConstatado: defeitoConstatado,
         solucao: solucao,
         valServico: valServico,
-        valMaterial: valeMaterial,
-        total: valServico + valeMaterial,
+        valMaterial: valMaterial,
+        total: valServico + valMaterial,
         garantiaPeca: garantiaPeca,
         garantiaServico: garantiaServico,
         client_id: cliente_id,

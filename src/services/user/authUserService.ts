@@ -1,13 +1,14 @@
 import { compare } from "bcryptjs";
 import prismaClient from "../../prisma";
 import { sign } from "jsonwebtoken";
+import { Prisma } from "@prisma/client";
 interface AuthRequest {
   email: string;
   password: string;
 }
 
 export class AuthUserService {
-  async execute({ email, password }: AuthRequest) {
+  async execute({ email, password }: Prisma.UserCreateInput) {
     const user = await prismaClient.user.findFirst({
       where: {
         email: email,
