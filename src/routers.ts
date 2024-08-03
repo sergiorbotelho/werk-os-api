@@ -5,6 +5,7 @@ import { detailUserController } from "./controllers/user/detailUserControllers";
 import { isAuthenticated } from "./middlewares/isAuthenticated";
 import { CreateClientController } from "./controllers/client/createClientControllers";
 import { CreateOsControllers } from "./controllers/os/createOsControllers";
+import { GetCustomersControllers } from "./controllers/client/getCustomersControllers";
 
 const router = Router();
 
@@ -15,6 +16,8 @@ router.post("/session", new authUserControllers().handle);
 router.get("/me", isAuthenticated, new detailUserController().handle);
 
 router.post("/client", isAuthenticated, new CreateClientController().handle);
+
+router.get("/customers", isAuthenticated, new GetCustomersControllers().handle);
 
 router.post("/os", isAuthenticated, new CreateOsControllers().handle);
 
