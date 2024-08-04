@@ -9,6 +9,6 @@ export class authUserControllers {
 
     const auth = await authUserService.execute({ email, password });
 
-    return res.json(auth);
+    return res.status(200).json(auth);
   }
 }

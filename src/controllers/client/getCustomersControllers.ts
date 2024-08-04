@@ -7,6 +7,6 @@ export class GetCustomersControllers {
 
     const customers = await getCustomersServices.execute();
 
-    return res.status(201).json(customers);
+    return res.status(200).json(customers);
   }
 }

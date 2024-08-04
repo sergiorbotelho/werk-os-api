@@ -31,6 +31,6 @@ export class CreateClientController {
       uf,
     });
 
-    return res.json(client);
+    return res.status(201).json(client);
   }
 }

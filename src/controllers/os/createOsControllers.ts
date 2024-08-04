@@ -29,6 +29,6 @@ export class CreateOsControllers {
       cliente_id,
     });
 
-    res.json(os);
+    res.status(201).json(os);
   }
 }
