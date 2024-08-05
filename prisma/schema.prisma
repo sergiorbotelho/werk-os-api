@@ -34,8 +34,8 @@ model Client{
   id String @id @default(uuid())
   nome String @db.VarChar(255)
   telefone String @db.VarChar(20)
-  cpf String @db.VarChar(11) @unique
-  cnpj String @db.VarChar(14) @unique
+  cpf String? @db.VarChar(11) @unique
+  cnpj String? @db.VarChar(14) @unique
   cep String @db.VarChar(8)
   endereco String @db.VarChar(255)
   numero String @db.VarChar(20)
