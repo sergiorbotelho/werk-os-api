@@ -2,8 +2,16 @@ import prismaClient from "../../prisma";
 
 export class GetCustomersServices {
   async execute() {
-    const customers = prismaClient.client.findMany({
+    const count = await prismaClient.client.count();
+    // const page = 0;
+    const customers = await prismaClient.client.findMany({
+      orderBy: {
+        nome: "asc",
+      },
+      // skip: page * 2,
+      // take: 2,
       select: {
+        id: true,
         nome: true,
         telefone: true,
         cpf: true,
@@ -17,6 +25,6 @@ export class GetCustomersServices {
       },
     });
 
-    return customers;
+    return { customers, count };
   }
 }

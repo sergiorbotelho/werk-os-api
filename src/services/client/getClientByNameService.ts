@@ -10,6 +10,7 @@ export class GetClientByNameService {
         },
       },
       select: {
+        id: true,
         nome: true,
         telefone: true,
         cpf: true,
