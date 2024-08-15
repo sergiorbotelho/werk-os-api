@@ -9,7 +9,6 @@ export class GetAllOsService {
       // take: 2,
       select: {
         id: true,
-        client: true,
         client_id: true,
       },
     });

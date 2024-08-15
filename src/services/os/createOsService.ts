@@ -9,7 +9,7 @@ interface RequestProps {
   valMaterial: number;
   garantiaPeca: string;
   garantiaServico: string;
-  cliente_id: string;
+  cliente_id: number;
 }
 
 export class CreateOsService {

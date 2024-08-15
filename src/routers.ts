@@ -8,6 +8,8 @@ import { CreateOsControllers } from "./controllers/os/createOsControllers";
 import { GetCustomersControllers } from "./controllers/client/getCustomersControllers";
 import { GetClientByNameControllers } from "./controllers/client/getClientByNameControllers";
 import { GetAllOsController } from "./controllers/os/getAllOsControllers";
+import { GetOsByIdController } from "./controllers/os/getOsByIdControllers";
+import { GetAllOsByController } from "./controllers/os/getAllOsByClientControllers";
 
 const router = Router();
 
@@ -26,6 +28,13 @@ router.get(
 );
 
 router.get("/os", isAuthenticated, new GetAllOsController().handle);
+
+router.get("/os/:id", isAuthenticated, new GetOsByIdController().handle);
+router.get(
+  "/os/client/:clientId",
+  isAuthenticated,
+  new GetAllOsByController().handle
+);
 
 router.get("/customers", isAuthenticated, new GetCustomersControllers().handle);
 

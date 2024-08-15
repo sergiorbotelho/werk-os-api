@@ -31,7 +31,7 @@ model User {
 }
 
 model Client{
-  id String @id @default(uuid())
+  id Int @id @default(autoincrement())
   nome String @db.VarChar(255)
   telefone String @db.VarChar(20)
   cpf String? @db.VarChar(11) @unique
@@ -50,7 +50,7 @@ model Client{
 }
 
 model Os{
-  id String @id @default(uuid())
+  id Int @id @default(autoincrement())
   modeloEquipamento String
   defeito String
   defeitoConstatado String
@@ -60,10 +60,9 @@ model Os{
   total Decimal @db.Decimal(30,2)
   garantiaPeca String
   garantiaServico String
-  numero Int @default(autoincrement())
   client Client @relation(fields: [client_id], references: [id])
   tipoServico TipoServico @default(FORADEGARANTIA)
   @@map("os")
-  client_id String
+  client_id Int
 }
 
