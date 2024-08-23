@@ -10,6 +10,7 @@ import { GetClientByNameControllers } from "./controllers/client/getClientByName
 import { GetAllOsController } from "./controllers/os/getAllOsControllers";
 import { GetOsByIdController } from "./controllers/os/getOsByIdControllers";
 import { GetAllOsByController } from "./controllers/os/getAllOsByClientControllers";
+import { UpdateClientController } from "./controllers/client/updateClientControllers";
 
 const router = Router();
 
@@ -35,6 +36,8 @@ router.get(
   isAuthenticated,
   new GetAllOsByController().handle
 );
+
+router.put("/client/:id", isAuthenticated, new UpdateClientController().handle);
 
 router.get("/customers", isAuthenticated, new GetCustomersControllers().handle);
 
