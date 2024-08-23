@@ -13,7 +13,7 @@ export function isAuthenticated(
   const authToken = req.headers.authorization;
 
   if (!authToken) {
-    return res.status(401).end();
+    throw new Error("Não autorizado");
   }
 
   const [, token] = authToken.split(" ");
@@ -26,6 +26,6 @@ export function isAuthenticated(
     return next();
   } catch (error) {
     console.log(error);
-    return res.status(401).end();
+    throw new Error("Não autorizado");
   }
 }
