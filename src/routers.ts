@@ -11,6 +11,7 @@ import { GetAllOsController } from "./controllers/os/getAllOsControllers";
 import { GetOsByIdController } from "./controllers/os/getOsByIdControllers";
 import { GetAllOsByController } from "./controllers/os/getAllOsByClientControllers";
 import { UpdateClientController } from "./controllers/client/updateClientControllers";
+import { UpdateOsControllers } from "./controllers/os/updateOsControlles";
 
 const router = Router();
 
@@ -38,6 +39,7 @@ router.get(
 );
 
 router.put("/client/:id", isAuthenticated, new UpdateClientController().handle);
+router.put("/os/:id", isAuthenticated, new UpdateOsControllers().handle);
 
 router.get("/customers", isAuthenticated, new GetCustomersControllers().handle);
 
