@@ -51,7 +51,10 @@ model Client{
 
 model Os{
   id Int @id @default(autoincrement())
+  contato String
   modeloEquipamento String
+  horaChegada String
+  horaSaida String
   defeito String
   defeitoConstatado String
   solucao String
@@ -60,6 +63,8 @@ model Os{
   total Decimal @db.Decimal(30,2)
   garantiaPeca String
   garantiaServico String
+  created_at DateTime? @default(now())
+  update_at DateTime?  @updatedAt
   client Client @relation(fields: [client_id], references: [id])
   tipoServico TipoServico @default(FORADEGARANTIA)
   @@map("os")
