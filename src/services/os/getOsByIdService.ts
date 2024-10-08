@@ -9,8 +9,11 @@ export class GetOsByIdService {
         },
       },
       select: {
+        contato: true,
         modeloEquipamento: true,
         defeito: true,
+        horaChegada: true,
+        horaSaida: true,
         defeitoConstatado: true,
         solucao: true,
         valServico: true,

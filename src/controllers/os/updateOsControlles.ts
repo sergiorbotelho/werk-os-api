@@ -6,7 +6,10 @@ export class UpdateOsControllers {
     const isIdString = req.params.id;
     const id = Number(isIdString);
     const {
+      contato,
       modeloEquipamento,
+      horaChegada,
+      horaSaida,
       defeito,
       defeitoConstatado,
       solucao,
@@ -21,6 +24,9 @@ export class UpdateOsControllers {
 
     const os = await updateOsService.execute({
       id,
+      contato,
+      horaChegada,
+      horaSaida,
       modeloEquipamento,
       defeito,
       defeitoConstatado,

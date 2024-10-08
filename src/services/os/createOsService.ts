@@ -1,6 +1,9 @@
 import prismaClient from "../../prisma";
 
 interface RequestProps {
+  contato: string;
+  horaChegada: string;
+  horaSaida: string;
   modeloEquipamento: string;
   defeito: string;
   defeitoConstatado: string;
@@ -14,6 +17,9 @@ interface RequestProps {
 
 export class CreateOsService {
   async execute({
+    contato,
+    horaChegada,
+    horaSaida,
     modeloEquipamento,
     defeito,
     defeitoConstatado,
@@ -26,6 +32,9 @@ export class CreateOsService {
   }: RequestProps) {
     const os = await prismaClient.os.create({
       data: {
+        contato: contato,
+        horaChegada: horaChegada,
+        horaSaida: horaSaida,
         modeloEquipamento: modeloEquipamento,
         defeito: defeito,
         defeitoConstatado: defeitoConstatado,

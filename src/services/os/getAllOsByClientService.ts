@@ -13,6 +13,8 @@ export class GetAllOsByClientService {
       select: {
         id: true,
         modeloEquipamento: true,
+        horaChegada: true,
+        horaSaida: true,
         defeito: true,
         defeitoConstatado: true,
         solucao: true,

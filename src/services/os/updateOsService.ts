@@ -4,6 +4,9 @@ import { cnpj as cpnjValid, cpf as cpfValid } from "cpf-cnpj-validator";
 
 interface OsProps {
   id: number;
+  contato: string;
+  horaChegada: string;
+  horaSaida: string;
   modeloEquipamento: string;
   defeito: string;
   defeitoConstatado: string;
@@ -19,6 +22,9 @@ interface OsProps {
 export class UpdateOsService {
   async execute({
     id,
+    contato,
+    horaChegada,
+    horaSaida,
     modeloEquipamento,
     defeito,
     defeitoConstatado,
@@ -45,7 +51,10 @@ export class UpdateOsService {
         id,
       },
       data: {
+        contato,
         modeloEquipamento,
+        horaChegada,
+        horaSaida,
         defeito,
         defeitoConstatado,
         solucao,
