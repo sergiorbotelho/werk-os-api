@@ -1,6 +1,6 @@
-import { Prisma, TipoServico } from "@prisma/client";
+import { TipoServico } from "@prisma/client";
 import prismaClient from "../../prisma";
-import { cnpj as cpnjValid, cpf as cpfValid } from "cpf-cnpj-validator";
+import AppError from "../../utils/appError";
 
 interface OsProps {
   id: number;
@@ -43,7 +43,7 @@ export class UpdateOsService {
     });
 
     if (!idExists) {
-      throw new Error("Os não encontrada");
+      throw new AppError("Os não encontrada", 404);
     }
 
     const os = await prismaClient.os.update({

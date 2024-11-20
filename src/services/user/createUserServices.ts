@@ -1,10 +1,11 @@
+import { Prisma } from "@prisma/client";
 import { hash } from "bcryptjs";
 import prismaClient from "../../prisma";
-import { Prisma } from "@prisma/client";
+import AppError from "../../utils/appError";
 export class CreateUserService {
   async execute({ name, email, password }: Prisma.UserCreateInput) {
     if (!email) {
-      throw new Error("Email incorrect");
+      throw new AppError("Email incorrect", 400);
     }
 
     const userAlreadyExists = await prismaClient.user.findFirst({
@@ -14,7 +15,7 @@ export class CreateUserService {
     });
 
     if (userAlreadyExists) {
-      throw new Error("User alreary exists");
+      throw new AppError("User alreary exists", 400);
     }
 
     const passwordHash = await hash(password, 8);

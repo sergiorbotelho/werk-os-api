@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
+import { cpf as cpfValid, cnpj as cpnjValid } from "cpf-cnpj-validator";
 import prismaClient from "../../prisma";
-import { cnpj as cpnjValid, cpf as cpfValid } from "cpf-cnpj-validator";
+import AppError from "../../utils/appError";
 export class CreateClientService {
   async execute({
     nome,
@@ -15,18 +16,18 @@ export class CreateClientService {
     uf,
   }: Prisma.ClientCreateInput) {
     if (nome.trim().length === 0) {
-      throw new Error("Nome inválido");
+      throw new AppError("Nome inválido", 400);
     }
 
     if (cpf.trim().length === 0 && cnpj.trim().length === 0) {
-      throw new Error("Informa ao menos um CPF ou CNPJ");
+      throw new AppError("Informa ao menos um CPF ou CNPJ", 400);
     }
 
     if (cpf.trim().length !== 0 && !cpfValid.isValid(cpf)) {
-      throw new Error("CPF Inválido");
+      throw new AppError("CPF Inválido", 400);
     }
     if (cnpj.trim().length !== 0 && !cpnjValid.isValid(cnpj)) {
-      throw new Error("CNPJ Inválido");
+      throw new AppError("CNPJ Inválido", 400);
     }
 
     const clientExists = await prismaClient.client.findFirst({
@@ -36,7 +37,7 @@ export class CreateClientService {
     });
 
     if (clientExists) {
-      throw new Error("CPF ou CNPJ Já cadastrado");
+      throw new AppError("CPF ou CNPJ Já cadastrado", 400);
     }
 
     const cliente = await prismaClient.client.create({

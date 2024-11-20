@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken";
+import AppError from "../utils/appError";
 
 interface Payload {
   sub: string;
@@ -13,7 +14,7 @@ export function isAuthenticated(
   const authToken = req.headers.authorization;
 
   if (!authToken) {
-    throw new Error("Não autorizado");
+    throw new AppError("Não autorizado", 401);
   }
 
   const [, token] = authToken.split(" ");
@@ -26,6 +27,6 @@ export function isAuthenticated(
     return next();
   } catch (error) {
     console.log(error);
-    throw new Error("Não autorizado");
+    throw new AppError("Não autorizado", 401);
   }
 }
