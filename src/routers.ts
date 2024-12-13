@@ -1,21 +1,21 @@
 import { Router } from "express";
-import { CreateUserController } from "./controllers/user/createUserControllers";
-import { authUserControllers } from "./controllers/user/authUserControllers";
-import { detailUserController } from "./controllers/user/detailUserControllers";
-import { isAuthenticated } from "./middlewares/isAuthenticated";
 import { CreateClientController } from "./controllers/client/createClientControllers";
-import { CreateOsControllers } from "./controllers/os/createOsControllers";
-import { GetCustomersControllers } from "./controllers/client/getCustomersControllers";
 import { GetClientByNameControllers } from "./controllers/client/getClientByNameControllers";
+import { GetCustomersControllers } from "./controllers/client/getCustomersControllers";
+import { UpdateClientController } from "./controllers/client/updateClientControllers";
+import { CreateOsControllers } from "./controllers/os/createOsControllers";
+import { GetAllOsByController } from "./controllers/os/getAllOsByClientControllers";
 import { GetAllOsController } from "./controllers/os/getAllOsControllers";
 import { GetOsByIdController } from "./controllers/os/getOsByIdControllers";
-import { GetAllOsByController } from "./controllers/os/getAllOsByClientControllers";
-import { UpdateClientController } from "./controllers/client/updateClientControllers";
 import { UpdateOsControllers } from "./controllers/os/updateOsControlles";
+import { authUserControllers } from "./controllers/user/authUserControllers";
+import { CreateUserController } from "./controllers/user/createUserControllers";
+import { detailUserController } from "./controllers/user/detailUserControllers";
+import { isAuthenticated } from "./middlewares/isAuthenticated";
 
 const router = Router();
 
-router.post("/users", new CreateUserController().handle);
+router.post("/users", isAuthenticated, new CreateUserController().handle);
 
 router.post("/session", new authUserControllers().handle);
 
