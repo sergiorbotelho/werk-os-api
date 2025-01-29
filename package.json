@@ -9,7 +9,7 @@
     "start": "node dist/server.js"
   },
   "prisma": {
-    "seed": "node dist/prisma/seed.ts"
+    "seed": "node dist/prisma/seed.js"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

@@ -1,4 +1,5 @@
 import { hash } from "bcryptjs";
+import AppError from "../utils/appError";
 import prismaClient from "./";
 
 async function seed() {
@@ -13,7 +14,11 @@ async function seed() {
   });
 }
 
-seed().then(() => {
-  console.log("Database seeded!");
-  prismaClient.$disconnect();
-});
+seed()
+  .then(() => {
+    console.log("Database seeded!");
+    prismaClient.$disconnect();
+  })
+  .catch((error) => {
+    throw new AppError("Seed ja exite", 400);
+  });

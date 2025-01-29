@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TipoServico {
+  GARANTIA
+  FORADEGARANTIA
+  ORCAMENTO
+  CONTRATO
+}
+model User {
+  id String @id @default(uuid())
+  name String @db.VarChar(255) 
+  email String @db.VarChar(255) @unique
+  password String @db.VarChar(255)
+  created_at DateTime? @default(now())
+  update_at DateTime?  @updatedAt
+
+  @@map("users")
+}
+
+model Client{
+  id Int @id @default(autoincrement())
+  nome String @db.VarChar(255)
+  telefone String @db.VarChar(20)
+  cpf String? @db.VarChar(11) @unique
+  cnpj String? @db.VarChar(14) @unique
+  cep String @db.VarChar(8)
+  endereco String @db.VarChar(255)
+  numero String @db.VarChar(20)
+  bairro String @db.VarChar(255)
+  cidade String @db.VarChar(150)
+  uf String @db.VarChar(2)
+  created_at DateTime? @default(now())
+  update_at DateTime?  @updatedAt
+
+  @@map("clients")
+  os Os[]
+}
+
+model Os{
+  id Int @id @default(autoincrement())
+  contato String
+  modeloEquipamento String
+  horaChegada String
+  horaSaida String
+  defeito String
+  defeitoConstatado String
+  solucao String
+  valServico Decimal @db.Decimal(30,2)
+  valMaterial Decimal @db.Decimal(30,2)
+  total Decimal @db.Decimal(30,2)
+  garantiaPeca String
+  garantiaServico String
+  created_at DateTime? @default(now())
+  update_at DateTime?  @updatedAt
+  client Client @relation(fields: [client_id], references: [id])
+  tipoServico TipoServico @default(FORADEGARANTIA)
+  @@map("os")
+  client_id Int
+}

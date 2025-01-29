@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "os" ADD COLUMN     "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "update_at" TIMESTAMP(3);
