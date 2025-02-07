@@ -1,6 +1,6 @@
 import { hash } from "bcryptjs";
-import AppError from "../utils/appError";
-import prismaClient from "./";
+import prismaClient from ".";
+import AppError from "../src/utils/appError";
 
 async function seed() {
   const passwordHash = await hash("123456", 8);
