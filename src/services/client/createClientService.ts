@@ -1,7 +1,21 @@
-import { Prisma } from "@prisma/client";
 import { cpf as cpfValid, cnpj as cpnjValid } from "cpf-cnpj-validator";
 import prismaClient from "../../prisma";
 import AppError from "../../utils/appError";
+
+interface ClientProps {
+  nome: string;
+  telefone: string;
+  cpf?: string | null;
+  cnpj?: string | null;
+  cep: string;
+  endereco: string;
+  numero: string;
+  bairro: string;
+  cidade: string;
+  uf: string;
+  created_at?: Date | string | null;
+  update_at?: Date | string | null;
+}
 export class CreateClientService {
   async execute({
     nome,
@@ -14,7 +28,7 @@ export class CreateClientService {
     bairro,
     cidade,
     uf,
-  }: Prisma.ClientCreateInput) {
+  }: ClientProps) {
     if (nome.trim().length === 0) {
       throw new AppError("Nome inválido", 400);
     }

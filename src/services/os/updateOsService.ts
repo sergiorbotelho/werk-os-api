@@ -1,4 +1,3 @@
-import { TipoServico } from "@prisma/client";
 import prismaClient from "../../prisma";
 import AppError from "../../utils/appError";
 
@@ -16,7 +15,7 @@ interface OsProps {
   garantiaPeca: string;
   garantiaServico: string;
   cliente_id: number;
-  tipoServico: TipoServico;
+  tipoServico: "GARANTIA" | "FORADEGARANTIA" | "ORCAMENTO" | "CONTRATO";
 }
 
 export class UpdateOsService {

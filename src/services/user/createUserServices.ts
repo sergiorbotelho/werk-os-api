@@ -1,9 +1,17 @@
-import { Prisma } from "@prisma/client";
 import { hash } from "bcryptjs";
 import prismaClient from "../../prisma";
 import AppError from "../../utils/appError";
+
+interface UserProps {
+  id?: string;
+  name: string;
+  email: string;
+  password: string;
+  created_at?: Date | string | null;
+  update_at?: Date | string | null;
+}
 export class CreateUserService {
-  async execute({ name, email, password }: Prisma.UserCreateInput) {
+  async execute({ name, email, password }: UserProps) {
     if (!email) {
       throw new AppError("Email incorrect", 400);
     }
