@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateOsService = void 0;
-const prisma_1 = __importDefault(require("../../../prisma"));
+const prisma_1 = __importDefault(require("../../prisma"));
 class CreateOsService {
     execute(_a) {
         return __awaiter(this, arguments, void 0, function* ({ contato, horaChegada, horaSaida, modeloEquipamento, defeito, defeitoConstatado, solucao, valServico, valMaterial, garantiaPeca, garantiaServico, cliente_id, }) {

@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthUserService = void 0;
 const bcryptjs_1 = require("bcryptjs");
 const jsonwebtoken_1 = require("jsonwebtoken");
-const prisma_1 = __importDefault(require("../../../prisma"));
+const prisma_1 = __importDefault(require("../../prisma"));
 const appError_1 = __importDefault(require("../../utils/appError"));
 class AuthUserService {
     execute(_a) {

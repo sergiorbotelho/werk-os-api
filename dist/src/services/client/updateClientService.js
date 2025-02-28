@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateClientService = void 0;
 const cpf_cnpj_validator_1 = require("cpf-cnpj-validator");
-const prisma_1 = __importDefault(require("../../../prisma"));
+const prisma_1 = __importDefault(require("../../prisma"));
 const appError_1 = __importDefault(require("../../utils/appError"));
 class UpdateClientService {
     execute(_a) {

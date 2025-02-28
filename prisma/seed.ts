@@ -1,5 +1,5 @@
 import { hash } from "bcryptjs";
-import prismaClient from ".";
+import prismaClient from "../src/prisma";
 import AppError from "../src/utils/appError";
 
 async function seed() {
