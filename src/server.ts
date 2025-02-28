@@ -10,5 +10,5 @@ app.use(cors());
 
 app.use(router);
 app.use(errorHandler);
-const PORT = process.env.PORT || 3333;
-app.listen(3333, () => console.log(`Server at running on ${PORT}`));
+const PORT = process.env.PORT;
+app.listen(PORT, () => console.log(`Server at running on ${PORT}`));
