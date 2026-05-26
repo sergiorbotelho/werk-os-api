@@ -2,21 +2,14 @@ import { hash } from "bcryptjs";
 import prismaClient from "../src/prisma";
 
 async function seed() {
-  const userAlreadyExists = await prismaClient.user.findUnique({
+  const passwordHash = await hash("123456", 8);
+
+  await prismaClient.user.upsert({
     where: {
       email: "admin@werk.com.br",
     },
-  });
-
-  if (userAlreadyExists) {
-    console.log("Seed já existe.");
-    return;
-  }
-
-  const passwordHash = await hash("123456", 8);
-
-  await prismaClient.user.create({
-    data: {
+    update: {},
+    create: {
       id: "56d5910d-71d8-4a29-92b3-edfd624960a6",
       name: "Sergio Botelho",
       email: "admin@werk.com.br",
