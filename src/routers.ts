@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { CreateClientController } from "./controllers/client/createClientControllers";
-import { GetClientByNameControllers } from "./controllers/client/getClientByNameControllers";
-import { GetCustomersControllers } from "./controllers/client/getCustomersControllers";
-import { UpdateClientController } from "./controllers/client/updateClientControllers";
+import { CreateCustomerController } from "./controllers/customer/createCustomerControllers";
+import { GetClientByNameControllers } from "./controllers/customer/getCustomerByNameControllers";
+import { GetCustomersControllers } from "./controllers/customer/getCustomersControllers";
+import { UpdateClientController } from "./controllers/customer/updateCustomerControllers";
 import { CreateOsControllers } from "./controllers/os/createOsControllers";
 import { GetAllOsByController } from "./controllers/os/getAllOsByClientControllers";
 import { GetAllOsController } from "./controllers/os/getAllOsControllers";
@@ -21,12 +21,16 @@ router.post("/session", new authUserControllers().handle);
 
 router.get("/me", isAuthenticated, new detailUserController().handle);
 
-router.post("/client", isAuthenticated, new CreateClientController().handle);
+router.post(
+  "/customer",
+  isAuthenticated,
+  new CreateCustomerController().handle,
+);
 
 router.get(
   "/client/:name",
   isAuthenticated,
-  new GetClientByNameControllers().handle
+  new GetClientByNameControllers().handle,
 );
 
 router.get("/os", isAuthenticated, new GetAllOsController().handle);
@@ -35,7 +39,7 @@ router.get("/os/:id", isAuthenticated, new GetOsByIdController().handle);
 router.get(
   "/os/client/:clientId",
   isAuthenticated,
-  new GetAllOsByController().handle
+  new GetAllOsByController().handle,
 );
 
 router.put("/client/:id", isAuthenticated, new UpdateClientController().handle);

@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
-import { CreateClientService } from "../../services/client/createClientService";
+import { UpdateClientService } from "../../services/customer/updateClientService";
 import AppError from "../../utils/appError";
 
-export class CreateClientController {
+export class UpdateClientController {
   async handle(req: Request, res: Response) {
     try {
+      const isIdString = req.params.id;
+      const id = Number(isIdString);
       const {
         nome,
         telefone,
@@ -18,9 +20,10 @@ export class CreateClientController {
         uf,
       } = req.body;
 
-      const createClientService = new CreateClientService();
+      const updateClientService = new UpdateClientService();
 
-      const client = await createClientService.execute({
+      const client = await updateClientService.execute({
+        id,
         nome,
         telefone,
         cpf,

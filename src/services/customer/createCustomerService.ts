@@ -1,8 +1,7 @@
-import { cpf as cpfValid, cnpj as cpnjValid } from "cpf-cnpj-validator";
 import prismaClient from "../../prisma";
 import AppError from "../../utils/appError";
 
-interface ClientProps {
+interface CustomerProps {
   nome: string;
   telefone: string;
   cpf?: string | null;
@@ -16,7 +15,7 @@ interface ClientProps {
   created_at?: Date | string | null;
   update_at?: Date | string | null;
 }
-export class CreateClientService {
+export class CreateCustomerService {
   async execute({
     nome,
     telefone,
@@ -28,22 +27,7 @@ export class CreateClientService {
     bairro,
     cidade,
     uf,
-  }: ClientProps) {
-    if (nome.trim().length === 0) {
-      throw new AppError("Nome inválido", 400);
-    }
-
-    if (cpf.trim().length === 0 && cnpj.trim().length === 0) {
-      throw new AppError("Informa ao menos um CPF ou CNPJ", 400);
-    }
-
-    if (cpf.trim().length !== 0 && !cpfValid.isValid(cpf)) {
-      throw new AppError("CPF Inválido", 400);
-    }
-    if (cnpj.trim().length !== 0 && !cpnjValid.isValid(cnpj)) {
-      throw new AppError("CNPJ Inválido", 400);
-    }
-
+  }: CustomerProps) {
     const clientExists = await prismaClient.client.findFirst({
       where: {
         OR: [{ cpf: cpf }, { cnpj: cnpj }],
