@@ -1,6 +1,6 @@
 import prismaClient from "../../prisma";
 
-export class GetClientByNameService {
+export class GetCustomerByNameService {
   async execute(name: string) {
     const client = prismaClient.client.findMany({
       where: {

@@ -1,14 +1,19 @@
 import { Request, Response } from "express";
-import { GetClientByNameService } from "../../services/customer/getClientByNameService";
+import { serverError } from "../../helpers/http";
+import { GetCustomerByNameService } from "../../services/customer/getCustomerByNameService";
 
 export class GetClientByNameControllers {
   async handle(req: Request, res: Response) {
-    const { name } = req.params;
+    try {
+      const { name } = req.params;
 
-    const getClientByNameService = new GetClientByNameService();
+      const getClientByNameService = new GetCustomerByNameService();
 
-    const client = await getClientByNameService.execute(name);
+      const client = await getClientByNameService.execute(name.trim());
 
-    return res.status(200).json({ client });
+      return res.status(200).json({ client });
+    } catch (error) {
+      return serverError(res);
+    }
   }
 }

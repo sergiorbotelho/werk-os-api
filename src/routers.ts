@@ -28,7 +28,7 @@ router.post(
 );
 
 router.get(
-  "/client/:name",
+  "/customer/:name",
   isAuthenticated,
   new GetClientByNameControllers().handle,
 );
