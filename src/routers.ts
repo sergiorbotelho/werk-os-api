@@ -2,7 +2,7 @@ import { Router } from "express";
 import { CreateCustomerController } from "./controllers/customer/createCustomerControllers";
 import { GetClientByNameControllers } from "./controllers/customer/getCustomerByNameControllers";
 import { GetCustomersControllers } from "./controllers/customer/getCustomersControllers";
-import { UpdateClientController } from "./controllers/customer/updateCustomerControllers";
+import { UpdateCustomerController } from "./controllers/customer/updateCustomerControllers";
 import { CreateOsControllers } from "./controllers/os/createOsControllers";
 import { GetAllOsByController } from "./controllers/os/getAllOsByClientControllers";
 import { GetAllOsController } from "./controllers/os/getAllOsControllers";
@@ -32,6 +32,13 @@ router.get(
   isAuthenticated,
   new GetClientByNameControllers().handle,
 );
+router.get("/customers", isAuthenticated, new GetCustomersControllers().handle);
+
+router.put(
+  "/customer/:id",
+  isAuthenticated,
+  new UpdateCustomerController().handle,
+);
 
 router.get("/os", isAuthenticated, new GetAllOsController().handle);
 
@@ -42,10 +49,7 @@ router.get(
   new GetAllOsByController().handle,
 );
 
-router.put("/client/:id", isAuthenticated, new UpdateClientController().handle);
 router.put("/os/:id", isAuthenticated, new UpdateOsControllers().handle);
-
-router.get("/customers", isAuthenticated, new GetCustomersControllers().handle);
 
 router.post("/os", isAuthenticated, new CreateOsControllers().handle);
 

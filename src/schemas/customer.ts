@@ -1,7 +1,7 @@
 import { cnpj as cnpjValid, cpf as cpfValid } from "cpf-cnpj-validator";
 import z from "zod";
 
-export const createCustomerSchema = z
+export const createOrUpdateCustomerSchema = z
   .object({
     nome: z.string({ error: "Name is required" }).trim().min(3),
 
