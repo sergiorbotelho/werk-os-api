@@ -15,7 +15,8 @@ const moneySchema = z.coerce
   .refine(
     (value) => /^\d+(\.\d{1,2})?$/.test(value.toString()),
     "Máximo de 2 casas decimais",
-  );
+  )
+  .optional();
 
 const horaRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
@@ -40,23 +41,17 @@ export const createOrUpdateServiceSchema = z.object({
 
   defeito: z.string().trim().min(1, "Defeito é obrigatório"),
 
-  defeitoConstatado: z
-    .string()
-    .trim()
-    .min(1, "Defeito constatado é obrigatório"),
+  defeitoConstatado: z.string().trim().optional(),
 
-  solucao: z.string().trim().min(1, "Solução é obrigatória"),
+  solucao: z.string().trim().optional(),
 
   valServico: moneySchema,
 
   valMaterial: moneySchema,
 
-  garantiaPeca: z.string().trim().min(1, "Garantia da peça é obrigatória"),
+  garantiaPeca: z.string().trim().optional(),
 
-  garantiaServico: z
-    .string()
-    .trim()
-    .min(1, "Garantia do serviço é obrigatória"),
+  garantiaServico: z.string().trim().optional(),
 });
 
 export type OrdemServicoSchema = z.infer<typeof createOrUpdateServiceSchema>;

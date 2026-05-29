@@ -56,13 +56,13 @@ model Os{
   horaChegada String
   horaSaida String
   defeito String
-  defeitoConstatado String 
-  solucao String
-  valServico Decimal @db.Decimal(30,2)
-  valMaterial Decimal @db.Decimal(30,2)
-  total Decimal @db.Decimal(30,2)
-  garantiaPeca String
-  garantiaServico String
+  defeitoConstatado String? 
+  solucao String?
+  valServico Decimal? @db.Decimal(30,2)
+  valMaterial Decimal? @db.Decimal(30,2)
+  total Decimal? @db.Decimal(30,2)
+  garantiaPeca String?
+  garantiaServico String?
   created_at DateTime? @default(now())
   update_at DateTime?  @updatedAt
   client Client @relation(fields: [client_id], references: [id])
