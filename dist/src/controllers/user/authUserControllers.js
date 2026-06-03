@@ -13,23 +13,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authUserControllers = void 0;
+const zod_1 = require("zod");
+const http_1 = require("../../helpers/http");
+const user_1 = require("../../schemas/user");
 const authUserService_1 = require("../../services/user/authUserService");
 const appError_1 = __importDefault(require("../../utils/appError"));
 class authUserControllers {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { email, password } = req.body;
+                const params = req.body;
+                yield user_1.authUserSchema.parseAsync(params);
                 const authUserService = new authUserService_1.AuthUserService();
-                const auth = yield authUserService.execute({ email, password });
+                const auth = yield authUserService.execute(params);
                 return res.status(200).json(auth);
             }
             catch (error) {
+                if (error instanceof zod_1.ZodError) {
+                    return (0, http_1.badRequest)(res, error.issues[0].message);
+                }
                 if (error instanceof appError_1.default) {
                     return res.status(error.statusCode).json({ message: error.message });
                 }
-                console.error(error); // Log do erro para depuração
-                return res.status(500).json({ message: "Internal server error" });
+                console.error(error);
+                return (0, http_1.serverError)(res);
             }
         });
     }

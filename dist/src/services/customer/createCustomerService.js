@@ -12,25 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateClientService = void 0;
-const cpf_cnpj_validator_1 = require("cpf-cnpj-validator");
+exports.CreateCustomerService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 const appError_1 = __importDefault(require("../../utils/appError"));
-class CreateClientService {
+class CreateCustomerService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ nome, telefone, cpf, cnpj, cep, endereco, numero, bairro, cidade, uf, }) {
-            if (nome.trim().length === 0) {
-                throw new appError_1.default("Nome inválido", 400);
-            }
-            if (cpf.trim().length === 0 && cnpj.trim().length === 0) {
-                throw new appError_1.default("Informa ao menos um CPF ou CNPJ", 400);
-            }
-            if (cpf.trim().length !== 0 && !cpf_cnpj_validator_1.cpf.isValid(cpf)) {
-                throw new appError_1.default("CPF Inválido", 400);
-            }
-            if (cnpj.trim().length !== 0 && !cpf_cnpj_validator_1.cnpj.isValid(cnpj)) {
-                throw new appError_1.default("CNPJ Inválido", 400);
-            }
+        return __awaiter(this, arguments, void 0, function* ({ nome, telefone, email, cpf, cnpj, cep, endereco, numero, bairro, cidade, uf, }) {
             const clientExists = yield prisma_1.default.client.findFirst({
                 where: {
                     OR: [{ cpf: cpf }, { cnpj: cnpj }],
@@ -43,6 +30,7 @@ class CreateClientService {
                 data: {
                     nome: nome,
                     telefone: telefone,
+                    email: email,
                     cpf: cpf && cpf.trim() !== "" ? cpf : null,
                     cnpj: cnpj && cnpj.trim() !== "" ? cnpj : null,
                     cep: cep,
@@ -57,4 +45,4 @@ class CreateClientService {
         });
     }
 }
-exports.CreateClientService = CreateClientService;
+exports.CreateCustomerService = CreateCustomerService;

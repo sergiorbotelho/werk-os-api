@@ -8,33 +8,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateOsControllers = void 0;
+const zod_1 = require("zod");
+const http_1 = require("../../helpers/http");
 const updateOsService_1 = require("../../services/os/updateOsService");
+const appError_1 = __importDefault(require("../../utils/appError"));
 class UpdateOsControllers {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const isIdString = req.params.id;
-            const id = Number(isIdString);
-            const { contato, modeloEquipamento, horaChegada, horaSaida, defeito, defeitoConstatado, solucao, valServico, valMaterial, garantiaPeca, garantiaServico, tipoServico, cliente_id, } = req.body;
-            const updateOsService = new updateOsService_1.UpdateOsService();
-            const os = yield updateOsService.execute({
-                id,
-                contato,
-                horaChegada,
-                horaSaida,
-                modeloEquipamento,
-                defeito,
-                defeitoConstatado,
-                solucao,
-                valServico,
-                valMaterial,
-                garantiaPeca,
-                garantiaServico,
-                tipoServico,
-                cliente_id,
-            });
-            res.status(201).json(os);
+            try {
+                const isIdString = req.params.id;
+                const id = Number(isIdString);
+                const params = req.body;
+                const updateOsService = new updateOsService_1.UpdateOsService();
+                const os = yield updateOsService.execute(Object.assign({ id }, params));
+                res.status(201).json(os);
+            }
+            catch (error) {
+                if (error instanceof zod_1.ZodError) {
+                    return (0, http_1.badRequest)(res, error.issues[0].message);
+                }
+                if (error instanceof appError_1.default) {
+                    return res.status(error.statusCode).json({ message: error.message });
+                }
+                return (0, http_1.serverError)(res);
+            }
         });
     }
 }

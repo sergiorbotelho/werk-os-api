@@ -12,36 +12,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateUserService = void 0;
-const bcryptjs_1 = require("bcryptjs");
-const user_1 = require("../../errors/user");
+exports.DeleteCustomerService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
-class CreateUserService {
+const appError_1 = __importDefault(require("../../utils/appError"));
+class DeleteCustomerService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ name, email, password }) {
-            const userAlreadyExists = yield prisma_1.default.user.findFirst({
-                where: {
-                    email: email,
+        return __awaiter(this, arguments, void 0, function* ({ id }) {
+            const customer = yield prisma_1.default.client.findUnique({
+                where: { id },
+                include: {
+                    os: true,
                 },
             });
-            if (userAlreadyExists) {
-                throw new user_1.EmailAlreadyInUseError(email);
+            if (!customer) {
+                throw new appError_1.default("Cliente não encontrado", 404);
             }
-            const passwordHash = yield (0, bcryptjs_1.hash)(password, 8);
-            const user = yield prisma_1.default.user.create({
-                data: {
-                    name: name,
-                    email: email,
-                    password: passwordHash,
-                },
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                },
+            if (customer.os.length > 0) {
+                throw new appError_1.default("Não é possível excluir um cliente que possui ordens de serviço vinculadas.", 400);
+            }
+            yield prisma_1.default.client.delete({
+                where: { id },
             });
-            return { user };
+            return {
+                message: "Cliente removido com sucesso",
+            };
         });
     }
 }
-exports.CreateUserService = CreateUserService;
+exports.DeleteCustomerService = DeleteCustomerService;

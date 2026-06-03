@@ -12,37 +12,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateClientController = void 0;
-const createClientService_1 = require("../../services/client/createClientService");
+exports.CreateCustomerController = void 0;
+const zod_1 = require("zod");
+const http_1 = require("../../helpers/http");
+const customer_1 = require("../../schemas/customer");
+const createCustomerService_1 = require("../../services/customer/createCustomerService");
 const appError_1 = __importDefault(require("../../utils/appError"));
-class CreateClientController {
+class CreateCustomerController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { nome, telefone, cpf, cnpj, cep, endereco, numero, bairro, cidade, uf, } = req.body;
-                const createClientService = new createClientService_1.CreateClientService();
-                const client = yield createClientService.execute({
-                    nome,
-                    telefone,
-                    cpf,
-                    cnpj,
-                    cep,
-                    endereco,
-                    numero,
-                    bairro,
-                    cidade,
-                    uf,
-                });
+                const params = req.body;
+                yield customer_1.createCustomerSchema.parseAsync(params);
+                const createClientService = new createCustomerService_1.CreateCustomerService();
+                const client = yield createClientService.execute(params);
                 return res.status(201).json(client);
             }
             catch (error) {
+                if (error instanceof zod_1.ZodError) {
+                    return (0, http_1.badRequest)(res, error.issues[0].message);
+                }
                 if (error instanceof appError_1.default) {
                     return res.status(error.statusCode).json({ message: error.message });
                 }
-                console.error(error); // Log do erro para depuração
-                return res.status(500).json({ message: "Internal server error" });
+                return (0, http_1.serverError)(res);
             }
         });
     }
 }
-exports.CreateClientController = CreateClientController;
+exports.CreateCustomerController = CreateCustomerController;

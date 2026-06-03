@@ -9,16 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetClientByNameControllers = void 0;
-const getClientByNameService_1 = require("../../services/client/getClientByNameService");
-class GetClientByNameControllers {
+exports.DeleteCustomerController = void 0;
+const deleteCustomerServic_1 = require("../../services/customer/deleteCustomerServic");
+class DeleteCustomerController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { name } = req.params;
-            const getClientByNameService = new getClientByNameService_1.GetClientByNameService();
-            const client = yield getClientByNameService.execute(name);
-            return res.status(200).json({ client });
+            const id = Number(req.params.id);
+            const service = new deleteCustomerServic_1.DeleteCustomerService();
+            const result = yield service.execute({ id });
+            return res.status(200).json(result);
         });
     }
 }
-exports.GetClientByNameControllers = GetClientByNameControllers;
+exports.DeleteCustomerController = DeleteCustomerController;

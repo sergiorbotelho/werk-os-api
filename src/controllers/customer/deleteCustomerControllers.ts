@@ -1,16 +1,18 @@
 import { Request, Response } from "express";
 import { serverError } from "../../helpers/http";
-import { GetCustomersServices } from "../../services/customer/getCustomersServices";
+import { DeleteCustomerService } from "../../services/customer/deleteCustomerServic";
 import AppError from "../../utils/appError";
 
-export class GetCustomersControllers {
+export class DeleteCustomerController {
   async handle(req: Request, res: Response) {
     try {
-      const getCustomersServices = new GetCustomersServices();
+      const id = Number(req.params.id);
 
-      const customers = await getCustomersServices.execute();
+      const service = new DeleteCustomerService();
 
-      return res.status(200).json(customers);
+      const result = await service.execute({ id });
+
+      return res.status(200).json(result);
     } catch (error) {
       if (error instanceof AppError) {
         return res.status(error.statusCode).json({ message: error.message });

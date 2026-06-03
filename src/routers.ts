@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { CreateCustomerController } from "./controllers/customer/createCustomerControllers";
+import { DeleteCustomerController } from "./controllers/customer/deleteCustomerControllers";
 import { GetClientByNameControllers } from "./controllers/customer/getCustomerByNameControllers";
 import { GetCustomersControllers } from "./controllers/customer/getCustomersControllers";
 import { UpdateCustomerController } from "./controllers/customer/updateCustomerControllers";
@@ -33,6 +34,12 @@ router.get(
   new GetClientByNameControllers().handle,
 );
 router.get("/customers", isAuthenticated, new GetCustomersControllers().handle);
+
+router.delete(
+  "/customer/:id",
+  isAuthenticated,
+  new DeleteCustomerController().handle,
+);
 
 router.put(
   "/customer/:id",

@@ -12,40 +12,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateClientController = void 0;
-const updateClientService_1 = require("../../services/client/updateClientService");
+exports.UpdateCustomerController = void 0;
+const zod_1 = require("zod");
+const http_1 = require("../../helpers/http");
+const customer_1 = require("../../schemas/customer");
+const updateCustomerService_1 = require("../../services/customer/updateCustomerService");
 const appError_1 = __importDefault(require("../../utils/appError"));
-class UpdateClientController {
+class UpdateCustomerController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const isIdString = req.params.id;
                 const id = Number(isIdString);
-                const { nome, telefone, cpf, cnpj, cep, endereco, numero, bairro, cidade, uf, } = req.body;
-                const updateClientService = new updateClientService_1.UpdateClientService();
-                const client = yield updateClientService.execute({
-                    id,
-                    nome,
-                    telefone,
-                    cpf,
-                    cnpj,
-                    cep,
-                    endereco,
-                    numero,
-                    bairro,
-                    cidade,
-                    uf,
-                });
-                return res.status(201).json(client);
+                const params = req.body;
+                yield customer_1.updateCustomerSchema.parseAsync(params);
+                const updateCustomerService = new updateCustomerService_1.UpdateCustomerService();
+                const customer = yield updateCustomerService.execute(Object.assign({ id }, params));
+                return res.status(201).json(customer);
             }
             catch (error) {
+                if (error instanceof zod_1.ZodError) {
+                    return (0, http_1.badRequest)(res, error.issues[0].message);
+                }
                 if (error instanceof appError_1.default) {
                     return res.status(error.statusCode).json({ message: error.message });
                 }
-                console.error(error); // Log do erro para depuração
-                return res.status(500).json({ message: "Internal server error" });
+                return (0, http_1.serverError)(res);
             }
         });
     }
 }
-exports.UpdateClientController = UpdateClientController;
+exports.UpdateCustomerController = UpdateCustomerController;

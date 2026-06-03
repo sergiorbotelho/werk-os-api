@@ -10,27 +10,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateOsControllers = void 0;
+const zod_1 = require("zod");
+const http_1 = require("../../helpers/http");
+const order_1 = require("../../schemas/order");
 const createOsService_1 = require("../../services/os/createOsService");
 class CreateOsControllers {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { contato, horaChegada, horaSaida, modeloEquipamento, defeito, defeitoConstatado, solucao, valServico, valMaterial, garantiaPeca, garantiaServico, cliente_id, } = req.body;
-            const createOsService = new createOsService_1.CreateOsService();
-            const os = yield createOsService.execute({
-                contato,
-                horaChegada,
-                horaSaida,
-                modeloEquipamento,
-                defeito,
-                defeitoConstatado,
-                solucao,
-                valServico,
-                valMaterial,
-                garantiaPeca,
-                garantiaServico,
-                cliente_id,
-            });
-            res.status(201).json(os);
+            try {
+                const params = req.body;
+                yield order_1.createOrUpdateServiceSchema.parseAsync(params);
+                const createOsService = new createOsService_1.CreateOsService();
+                const os = yield createOsService.execute(params);
+                res.status(201).json(os);
+            }
+            catch (error) {
+                if (error instanceof zod_1.ZodError) {
+                    return (0, http_1.badRequest)(res, error.issues[0].message);
+                }
+                return (0, http_1.serverError)(res);
+            }
         });
     }
 }
