@@ -5,6 +5,7 @@ import { GetClientByNameControllers } from "./controllers/customer/getCustomerBy
 import { GetCustomersControllers } from "./controllers/customer/getCustomersControllers";
 import { UpdateCustomerController } from "./controllers/customer/updateCustomerControllers";
 import { CreateOsControllers } from "./controllers/os/createOsControllers";
+import { DeleteOsController } from "./controllers/os/deleteOsControllers";
 import { GetAllOsByController } from "./controllers/os/getAllOsByClientControllers";
 import { GetAllOsController } from "./controllers/os/getAllOsControllers";
 import { GetOsByIdController } from "./controllers/os/getOsByIdControllers";
@@ -59,5 +60,5 @@ router.get(
 router.put("/os/:id", isAuthenticated, new UpdateOsControllers().handle);
 
 router.post("/os", isAuthenticated, new CreateOsControllers().handle);
-
+router.delete("/os/:id", isAuthenticated, new DeleteOsController().handle);
 export { router };
