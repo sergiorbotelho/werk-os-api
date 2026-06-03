@@ -1,29 +1,36 @@
 import { cnpj as cnpjValid, cpf as cpfValid } from "cpf-cnpj-validator";
 import z from "zod";
 
-export const createOrUpdateCustomerSchema = z
-  .object({
-    nome: z.string({ error: "Name is required" }).trim().min(3),
+const customerBaseSchema = z.object({
+  nome: z.string({ error: "Nome é obrigatório" }).trim().min(3),
 
-    telefone: z.string().trim().max(20),
+  telefone: z
+    .string()
+    .trim()
+    .max(20)
+    .min(8, { error: "Telefone é obrigatório" }),
 
-    cpf: z.string().trim().max(11).optional().or(z.literal("")),
+  email: z.email({ error: "Endereço de email inválido" }).trim(),
 
-    cnpj: z.string().trim().max(14).optional().or(z.literal("")),
+  cpf: z.string().trim().max(11).optional().or(z.literal("")),
 
-    cep: z.string({ error: "CEP is required" }).trim().max(8),
+  cnpj: z.string().trim().max(14).optional().or(z.literal("")),
 
-    endereco: z.string({ error: "Endereço is required" }).trim(),
+  cep: z.string().trim().max(8).optional(),
 
-    numero: z.string({ error: "Número is required" }).trim().max(20),
+  endereco: z.string().trim().optional(),
 
-    bairro: z.string({ error: "Bairro is required" }).trim(),
+  numero: z.string().trim().max(20).optional(),
 
-    cidade: z.string({ error: "Cidade is required" }).trim(),
+  bairro: z.string().trim().optional(),
 
-    uf: z.string({ error: "UF is required" }).trim(),
-  })
-  .superRefine((data, ctx) => {
+  cidade: z.string().trim().optional(),
+
+  uf: z.string().trim().optional(),
+});
+
+export const createCustomerSchema = customerBaseSchema.superRefine(
+  (data, ctx) => {
     const cpf = data.cpf?.trim() || "";
     const cnpj = data.cnpj?.trim() || "";
 
@@ -56,4 +63,28 @@ export const createOrUpdateCustomerSchema = z
         path: ["cnpj"],
       });
     }
-  });
+  },
+);
+
+export const updateCustomerSchema = customerBaseSchema.superRefine(
+  (data, ctx) => {
+    const cpf = data.cpf?.trim() || "";
+    const cnpj = data.cnpj?.trim() || "";
+
+    if (cpf && !cpfValid.isValid(cpf)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "CPF inválido",
+        path: ["cpf"],
+      });
+    }
+
+    if (cnpj && !cnpjValid.isValid(cnpj)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "CNPJ inválido",
+        path: ["cnpj"],
+      });
+    }
+  },
+);

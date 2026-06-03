@@ -4,6 +4,7 @@ import AppError from "../../utils/appError";
 interface ClientProps {
   id: number;
   nome: string;
+  email: string;
   telefone: string;
   cpf?: string | null;
   cnpj?: string | null;
@@ -20,6 +21,7 @@ export class UpdateCustomerService {
     id,
     nome,
     telefone,
+    email,
     cpf,
     cnpj,
     cep,
@@ -37,15 +39,22 @@ export class UpdateCustomerService {
       throw new AppError("Cliente não encontrado", 400);
     }
 
+    const normalizedCpf = cpf?.trim() || null;
+    const normalizedCnpj = cnpj?.trim() || null;
+    if (!normalizedCpf && !normalizedCnpj) {
+      throw new AppError("Informe um CPF ou um CNPJ", 400);
+    }
+
     if (
-      (cpf && cpf !== existingClient.cpf) ||
-      (cnpj && cnpj !== existingClient.cnpj)
+      normalizedCpf !== existingClient.cpf ||
+      normalizedCnpj !== existingClient.cnpj
     ) {
       const clientExists = await prismaClient.client.findFirst({
         where: {
+          id: { not: id },
           OR: [
-            { cpf: cpf ?? undefined, id: { not: id } },
-            { cnpj: cnpj ?? undefined, id: { not: id } },
+            normalizedCpf ? { cpf: normalizedCpf } : {},
+            normalizedCnpj ? { cnpj: normalizedCnpj } : {},
           ],
         },
       });
@@ -62,8 +71,9 @@ export class UpdateCustomerService {
       data: {
         nome,
         telefone,
-        cpf: cpf && cpf.trim() !== "" ? cpf : null,
-        cnpj: cnpj && cnpj.trim() !== "" ? cnpj : null,
+        email,
+        cpf: normalizedCpf,
+        cnpj: normalizedCnpj,
         cep,
         endereco,
         numero,

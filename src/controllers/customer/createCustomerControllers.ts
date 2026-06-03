@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ZodError } from "zod";
 import { badRequest, serverError } from "../../helpers/http";
-import { createOrUpdateCustomerSchema } from "../../schemas/customer";
+import { createCustomerSchema } from "../../schemas/customer";
 import { CreateCustomerService } from "../../services/customer/createCustomerService";
 import AppError from "../../utils/appError";
 
@@ -10,7 +10,7 @@ export class CreateCustomerController {
     try {
       const params = req.body;
 
-      await createOrUpdateCustomerSchema.parseAsync(params);
+      await createCustomerSchema.parseAsync(params);
       const createClientService = new CreateCustomerService();
 
       const client = await createClientService.execute(params);

@@ -4,6 +4,7 @@ import AppError from "../../utils/appError";
 interface CustomerProps {
   nome: string;
   telefone: string;
+  email: string;
   cpf?: string | null;
   cnpj?: string | null;
   cep: string;
@@ -19,6 +20,7 @@ export class CreateCustomerService {
   async execute({
     nome,
     telefone,
+    email,
     cpf,
     cnpj,
     cep,
@@ -42,6 +44,7 @@ export class CreateCustomerService {
       data: {
         nome: nome,
         telefone: telefone,
+        email: email,
         cpf: cpf && cpf.trim() !== "" ? cpf : null,
         cnpj: cnpj && cnpj.trim() !== "" ? cnpj : null,
         cep: cep,
