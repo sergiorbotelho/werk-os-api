@@ -8,6 +8,7 @@ const getCustomerByNameControllers_1 = require("./controllers/customer/getCustom
 const getCustomersControllers_1 = require("./controllers/customer/getCustomersControllers");
 const updateCustomerControllers_1 = require("./controllers/customer/updateCustomerControllers");
 const createOsControllers_1 = require("./controllers/os/createOsControllers");
+const deleteOsControllers_1 = require("./controllers/os/deleteOsControllers");
 const getAllOsByClientControllers_1 = require("./controllers/os/getAllOsByClientControllers");
 const getAllOsControllers_1 = require("./controllers/os/getAllOsControllers");
 const getOsByIdControllers_1 = require("./controllers/os/getOsByIdControllers");
@@ -31,3 +32,4 @@ router.get("/os/:id", isAuthenticated_1.isAuthenticated, new getOsByIdController
 router.get("/os/client/:clientId", isAuthenticated_1.isAuthenticated, new getAllOsByClientControllers_1.GetAllOsByController().handle);
 router.put("/os/:id", isAuthenticated_1.isAuthenticated, new updateOsControlles_1.UpdateOsControllers().handle);
 router.post("/os", isAuthenticated_1.isAuthenticated, new createOsControllers_1.CreateOsControllers().handle);
+router.delete("/os/:id", isAuthenticated_1.isAuthenticated, new deleteOsControllers_1.DeleteOsController().handle);

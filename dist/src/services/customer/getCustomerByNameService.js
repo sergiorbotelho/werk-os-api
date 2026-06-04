@@ -27,6 +27,7 @@ class GetCustomerByNameService {
                 select: {
                     id: true,
                     nome: true,
+                    email: true,
                     telefone: true,
                     cpf: true,
                     cnpj: true,

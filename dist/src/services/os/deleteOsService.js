@@ -12,26 +12,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetClientByNameControllers = void 0;
-const http_1 = require("../../helpers/http");
-const getCustomerByNameService_1 = require("../../services/customer/getCustomerByNameService");
+exports.DeleteOsService = void 0;
+const prisma_1 = __importDefault(require("../../prisma"));
 const appError_1 = __importDefault(require("../../utils/appError"));
-class GetClientByNameControllers {
-    handle(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { name } = req.params;
-                const getClientByNameService = new getCustomerByNameService_1.GetCustomerByNameService();
-                const client = yield getClientByNameService.execute(name.trim());
-                return res.status(200).json({ client });
+class DeleteOsService {
+    execute(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ id }) {
+            const os = yield prisma_1.default.os.findUnique({
+                where: {
+                    id,
+                },
+            });
+            if (!os) {
+                throw new appError_1.default("Ordem de serviço não encontrada", 404);
             }
-            catch (error) {
-                if (error instanceof appError_1.default) {
-                    return res.status(error.statusCode).json({ message: error.message });
-                }
-                return (0, http_1.serverError)(res);
-            }
+            yield prisma_1.default.os.delete({
+                where: {
+                    id,
+                },
+            });
+            return {
+                message: "Ordem de serviço removida com sucesso",
+            };
         });
     }
 }
-exports.GetClientByNameControllers = GetClientByNameControllers;
+exports.DeleteOsService = DeleteOsService;

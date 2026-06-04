@@ -8,16 +8,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteCustomerController = void 0;
+const http_1 = require("../../helpers/http");
 const deleteCustomerServic_1 = require("../../services/customer/deleteCustomerServic");
+const appError_1 = __importDefault(require("../../utils/appError"));
 class DeleteCustomerController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = Number(req.params.id);
-            const service = new deleteCustomerServic_1.DeleteCustomerService();
-            const result = yield service.execute({ id });
-            return res.status(200).json(result);
+            try {
+                const id = Number(req.params.id);
+                const service = new deleteCustomerServic_1.DeleteCustomerService();
+                const result = yield service.execute({ id });
+                return res.status(200).json(result);
+            }
+            catch (error) {
+                if (error instanceof appError_1.default) {
+                    return res.status(error.statusCode).json({ message: error.message });
+                }
+                return (0, http_1.serverError)(res);
+            }
         });
     }
 }

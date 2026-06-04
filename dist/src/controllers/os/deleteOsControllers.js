@@ -12,18 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetClientByNameControllers = void 0;
+exports.DeleteOsController = void 0;
 const http_1 = require("../../helpers/http");
-const getCustomerByNameService_1 = require("../../services/customer/getCustomerByNameService");
+const deleteOsService_1 = require("../../services/os/deleteOsService");
 const appError_1 = __importDefault(require("../../utils/appError"));
-class GetClientByNameControllers {
+class DeleteOsController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { name } = req.params;
-                const getClientByNameService = new getCustomerByNameService_1.GetCustomerByNameService();
-                const client = yield getClientByNameService.execute(name.trim());
-                return res.status(200).json({ client });
+                const id = Number(req.params.id);
+                const service = new deleteOsService_1.DeleteOsService();
+                const result = yield service.execute({ id });
+                return res.status(200).json(result);
             }
             catch (error) {
                 if (error instanceof appError_1.default) {
@@ -34,4 +34,4 @@ class GetClientByNameControllers {
         });
     }
 }
-exports.GetClientByNameControllers = GetClientByNameControllers;
+exports.DeleteOsController = DeleteOsController;
