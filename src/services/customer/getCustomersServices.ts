@@ -8,6 +8,7 @@ export class GetCustomersServices {
       orderBy: {
         nome: "asc",
       },
+
       // skip: page * 2,
       // take: 2,
       select: {
@@ -23,9 +24,22 @@ export class GetCustomersServices {
         cidade: true,
         uf: true,
         cep: true,
+        _count: {
+          select: {
+            os: true,
+          },
+        },
       },
     });
 
-    return { customers, count };
+    const formattedCustomers = customers.map(({ _count, ...customer }) => ({
+      ...customer,
+      totalOs: _count.os,
+    }));
+
+    return {
+      customers: formattedCustomers,
+      count,
+    };
   }
 }
