@@ -28,7 +28,11 @@ exports.createOrUpdateServiceSchema = zod_1.z.object({
         .trim()
         .min(1, "Modelo do equipamento é obrigatório"),
     horaChegada: zod_1.z.string().regex(horaRegex, "Hora de chegada inválida"),
-    horaSaida: zod_1.z.string().regex(horaRegex, "Hora de saída inválida"),
+    horaSaida: zod_1.z
+        .string()
+        .regex(horaRegex, "Hora de saída inválida")
+        .or(zod_1.z.literal(""))
+        .optional(),
     defeito: zod_1.z.string().trim().min(1, "Defeito é obrigatório"),
     defeitoConstatado: zod_1.z.string().trim().optional(),
     solucao: zod_1.z.string().trim().optional(),

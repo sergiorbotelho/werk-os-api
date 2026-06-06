@@ -55,7 +55,7 @@ model Os{
   contato String
   modeloEquipamento String
   horaChegada String
-  horaSaida String
+  horaSaida String?
   defeito String
   defeitoConstatado String? 
   solucao String?

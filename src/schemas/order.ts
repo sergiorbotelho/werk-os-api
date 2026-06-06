@@ -37,7 +37,11 @@ export const createOrUpdateServiceSchema = z.object({
 
   horaChegada: z.string().regex(horaRegex, "Hora de chegada inválida"),
 
-  horaSaida: z.string().regex(horaRegex, "Hora de saída inválida"),
+  horaSaida: z
+    .string()
+    .regex(horaRegex, "Hora de saída inválida")
+    .or(z.literal(""))
+    .optional(),
 
   defeito: z.string().trim().min(1, "Defeito é obrigatório"),
 
