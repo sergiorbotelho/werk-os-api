@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { CreateCustomerController } from "./controllers/customer/createCustomerControllers";
 import { DeleteCustomerController } from "./controllers/customer/deleteCustomerControllers";
-import { GetClientByNameControllers } from "./controllers/customer/getCustomerByNameControllers";
+import { GetClientByIdControllers } from "./controllers/customer/getCustomerByIdControllers";
 import { GetCustomersControllers } from "./controllers/customer/getCustomersControllers";
 import { UpdateCustomerController } from "./controllers/customer/updateCustomerControllers";
 import { CreateOsControllers } from "./controllers/os/createOsControllers";
@@ -30,9 +30,9 @@ router.post(
 );
 
 router.get(
-  "/customer/:name",
+  "/customer/:id",
   isAuthenticated,
-  new GetClientByNameControllers().handle,
+  new GetClientByIdControllers().handle,
 );
 router.get("/customers", isAuthenticated, new GetCustomersControllers().handle);
 

@@ -1,12 +1,11 @@
 import prismaClient from "../../prisma";
 
-export class GetCustomerByNameService {
-  async execute(name: string) {
+export class GetCustomerByIdService {
+  async execute(id: string) {
     const client = prismaClient.client.findMany({
       where: {
-        nome: {
-          startsWith: name,
-          mode: "insensitive",
+        id: {
+          equals: parseInt(id),
         },
       },
       select: {
