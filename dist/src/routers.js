@@ -4,7 +4,7 @@ exports.router = void 0;
 const express_1 = require("express");
 const createCustomerControllers_1 = require("./controllers/customer/createCustomerControllers");
 const deleteCustomerControllers_1 = require("./controllers/customer/deleteCustomerControllers");
-const getCustomerByNameControllers_1 = require("./controllers/customer/getCustomerByNameControllers");
+const getCustomerByIdControllers_1 = require("./controllers/customer/getCustomerByIdControllers");
 const getCustomersControllers_1 = require("./controllers/customer/getCustomersControllers");
 const updateCustomerControllers_1 = require("./controllers/customer/updateCustomerControllers");
 const createOsControllers_1 = require("./controllers/os/createOsControllers");
@@ -23,7 +23,7 @@ router.post("/users", isAuthenticated_1.isAuthenticated, new createUserControlle
 router.post("/session", new authUserControllers_1.authUserControllers().handle);
 router.get("/me", isAuthenticated_1.isAuthenticated, new detailUserControllers_1.detailUserController().handle);
 router.post("/customer", isAuthenticated_1.isAuthenticated, new createCustomerControllers_1.CreateCustomerController().handle);
-router.get("/customer/:name", isAuthenticated_1.isAuthenticated, new getCustomerByNameControllers_1.GetClientByNameControllers().handle);
+router.get("/customer/:id", isAuthenticated_1.isAuthenticated, new getCustomerByIdControllers_1.GetClientByIdControllers().handle);
 router.get("/customers", isAuthenticated_1.isAuthenticated, new getCustomersControllers_1.GetCustomersControllers().handle);
 router.delete("/customer/:id", isAuthenticated_1.isAuthenticated, new deleteCustomerControllers_1.DeleteCustomerController().handle);
 router.put("/customer/:id", isAuthenticated_1.isAuthenticated, new updateCustomerControllers_1.UpdateCustomerController().handle);

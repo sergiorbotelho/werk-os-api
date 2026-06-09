@@ -12,26 +12,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetClientByNameControllers = void 0;
-const http_1 = require("../../helpers/http");
-const getCustomerByNameService_1 = require("../../services/customer/getCustomerByNameService");
-const appError_1 = __importDefault(require("../../utils/appError"));
-class GetClientByNameControllers {
-    handle(req, res) {
+exports.GetCustomerByIdService = void 0;
+const prisma_1 = __importDefault(require("../../prisma"));
+class GetCustomerByIdService {
+    execute(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { name } = req.params;
-                const getClientByNameService = new getCustomerByNameService_1.GetCustomerByNameService();
-                const client = yield getClientByNameService.execute(name.trim());
-                return res.status(200).json({ client });
-            }
-            catch (error) {
-                if (error instanceof appError_1.default) {
-                    return res.status(error.statusCode).json({ message: error.message });
-                }
-                return (0, http_1.serverError)(res);
-            }
+            const client = prisma_1.default.client.findMany({
+                where: {
+                    id: {
+                        equals: parseInt(id),
+                    },
+                },
+                select: {
+                    id: true,
+                    nome: true,
+                    email: true,
+                    telefone: true,
+                    cpf: true,
+                    cnpj: true,
+                    endereco: true,
+                    numero: true,
+                    bairro: true,
+                    cidade: true,
+                    uf: true,
+                    cep: true,
+                },
+            });
+            return client;
         });
     }
 }
-exports.GetClientByNameControllers = GetClientByNameControllers;
+exports.GetCustomerByIdService = GetCustomerByIdService;
