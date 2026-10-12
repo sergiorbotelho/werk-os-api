@@ -15,14 +15,41 @@ import { authUserControllers } from "./controllers/user/authUserControllers";
 import { ChangePasswordController } from "./controllers/user/changePasswordController";
 import { CreateUserController } from "./controllers/user/createUserControllers";
 import { detailUserController } from "./controllers/user/detailUserControllers";
+import { ListUsersController } from "./controllers/user/listUsersController";
+import { ResetUserPasswordController } from "./controllers/user/resetUserPasswordController";
+import { UpdateUserController } from "./controllers/user/updateUserController";
 import {
   isAuthenticated,
   isAuthenticatedPendingPassword,
 } from "./middlewares/isAuthenticated";
+import { requireAdmin } from "./middlewares/requireAdmin";
 
 const router = Router();
 
-router.post("/users", isAuthenticated, new CreateUserController().handle);
+router.get(
+  "/users",
+  isAuthenticated,
+  requireAdmin,
+  new ListUsersController().handle,
+);
+router.post(
+  "/users",
+  isAuthenticated,
+  requireAdmin,
+  new CreateUserController().handle,
+);
+router.put(
+  "/users/:id",
+  isAuthenticated,
+  requireAdmin,
+  new UpdateUserController().handle,
+);
+router.post(
+  "/users/:id/reset-password",
+  isAuthenticated,
+  requireAdmin,
+  new ResetUserPasswordController().handle,
+);
 
 router.post("/session", new authUserControllers().handle);
 
@@ -53,6 +80,7 @@ router.get("/customers", isAuthenticated, new GetCustomersControllers().handle);
 router.delete(
   "/customer/:id",
   isAuthenticated,
+  requireAdmin,
   new DeleteCustomerController().handle,
 );
 
@@ -75,5 +103,10 @@ router.get(
 router.put("/os/:id", isAuthenticated, new UpdateOsControllers().handle);
 
 router.post("/os", isAuthenticated, new CreateOsControllers().handle);
-router.delete("/os/:id", isAuthenticated, new DeleteOsController().handle);
+router.delete(
+  "/os/:id",
+  isAuthenticated,
+  requireAdmin,
+  new DeleteOsController().handle,
+);
 export { router };

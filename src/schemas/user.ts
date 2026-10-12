@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 import { z } from "zod";
 
 // trim e toLowerCase antes do formato: " Maria@Werk.com " vira "maria@werk.com"
@@ -22,13 +23,24 @@ export const passwordSchema = z
   .regex(/[A-Za-z]/, { error: "A senha deve conter pelo menos uma letra" })
   .regex(/\d/, { error: "A senha deve conter pelo menos um número" });
 
+const roleSchema = z.enum(Role, { error: "Perfil inválido" });
+
+// A senha é gerada pela API (senha temporária), não vem no corpo
 export const createUserSchema = z.object({
   name: nameSchema,
   email: emailSchema,
-  password: z
-    .string({ error: "Senha é obrigatória" })
-    .min(6, { error: "A senha deve ter no mínimo 6 caracteres" }),
+  role: roleSchema,
 });
+
+export const updateUserSchema = z
+  .object({
+    name: nameSchema.optional(),
+    role: roleSchema.optional(),
+    active: z.boolean({ error: "Situação inválida" }).optional(),
+  })
+  .refine((data) => Object.values(data).some((value) => value !== undefined), {
+    error: "Informe ao menos um campo para alterar",
+  });
 
 export const authUserSchema = z.object({
   email: emailSchema,
@@ -45,5 +57,6 @@ export const changePasswordSchema = z.object({
 });
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type AuthUserInput = z.infer<typeof authUserSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

@@ -16,31 +16,34 @@ exports.CreateUserService = void 0;
 const bcryptjs_1 = require("bcryptjs");
 const prisma_1 = __importDefault(require("../../prisma"));
 const appError_1 = __importDefault(require("../../utils/appError"));
+const generateTemporaryPassword_1 = require("../../utils/generateTemporaryPassword");
+const userSelect_1 = require("./userSelect");
 class CreateUserService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ name, email, password }) {
+        return __awaiter(this, arguments, void 0, function* ({ name, email, role }) {
+            // Sem diferenciar maiúsculas: e-mails antigos podem ter sido gravados com maiúsculas
             const userAlreadyExists = yield prisma_1.default.user.findFirst({
                 where: {
-                    email: email,
+                    email: { equals: email, mode: "insensitive" },
                 },
             });
             if (userAlreadyExists) {
-                throw new appError_1.default(`The e-mail ${email} is already in use.`, 409);
+                throw new appError_1.default("E-mail já cadastrado", 409);
             }
-            const passwordHash = yield (0, bcryptjs_1.hash)(password, 8);
+            const temporaryPassword = (0, generateTemporaryPassword_1.generateTemporaryPassword)();
+            const passwordHash = yield (0, bcryptjs_1.hash)(temporaryPassword, 8);
             const user = yield prisma_1.default.user.create({
                 data: {
-                    name: name,
-                    email: email,
+                    name,
+                    email,
+                    role,
                     password: passwordHash,
+                    mustChangePassword: true,
                 },
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                },
+                select: userSelect_1.userSelect,
             });
-            return { user };
+            // A senha temporária só existe nesta resposta: o banco guarda o hash
+            return { user, temporaryPassword };
         });
     }
 }
