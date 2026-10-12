@@ -1,222 +1,292 @@
-# 🔧 Werk OS API
+# Werk OS API
 
-API REST desenvolvida para gerenciamento de Ordens de Serviço (OS), clientes e usuários.
+![Node.js](https://img.shields.io/badge/Node.js-22.14.0-339933?logo=nodedotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![Express](https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-5-2D3748?logo=prisma&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
 
-O sistema foi criado para atender assistências técnicas e empresas que necessitam controlar atendimentos, histórico de serviços, garantias, clientes e valores de serviços executados.
+API REST para gestão de **Ordens de Serviço (OS)**, clientes e usuários de assistências técnicas. Centraliza o registro de atendimentos, o histórico de serviços por cliente, o controle de garantias e os valores de serviço e material.
 
-## 🚀 Tecnologias Utilizadas
+## Sumário
 
-- Node.js
-- TypeScript
-- Express
-- Prisma ORM
-- PostgreSQL
-- JWT Authentication
-- Zod
-- Bcrypt
+- [Stack](#stack)
+- [Funcionalidades](#funcionalidades)
+- [Pré-requisitos](#pré-requisitos)
+- [Instalação e execução](#instalação-e-execução)
+- [Variáveis de ambiente](#variáveis-de-ambiente)
+- [Scripts](#scripts)
+- [Autenticação](#autenticação)
+- [Endpoints](#endpoints)
+- [Modelo de dados](#modelo-de-dados)
+- [Arquitetura](#arquitetura)
+- [Deploy](#deploy)
+- [Roadmap](#roadmap)
+- [Autor](#autor)
 
----
+## Stack
 
-## 📋 Funcionalidades
+| Camada         | Tecnologia                                  |
+| -------------- | ------------------------------------------- |
+| Runtime        | Node.js 22.14.0                             |
+| Linguagem      | TypeScript 5                                |
+| Framework HTTP | Express 4                                   |
+| ORM            | Prisma 5                                    |
+| Banco de dados | PostgreSQL                                  |
+| Autenticação   | JWT (`jsonwebtoken`) + `bcryptjs`           |
+| Validação      | Zod 4 + `cpf-cnpj-validator`                |
+| Deploy         | Vercel                                      |
 
-### 👤 Usuários
+## Funcionalidades
 
-- Cadastro de usuários
-- Login com autenticação JWT
-- Criptografia de senhas
-- Controle de acesso às rotas protegidas
+**Usuários**
 
-### 👥 Clientes
+- Cadastro de usuários com senha criptografada (bcrypt)
+- Login com emissão de token JWT (validade de 30 dias)
+- Consulta do usuário autenticado
 
-- Cadastro de clientes
-- Edição de clientes
-- Exclusão de clientes
-- Consulta de clientes
-- Busca de clientes vinculados às ordens de serviço
+**Clientes**
+
+- Cadastro, edição, exclusão e consulta
+- Validação de CPF e CNPJ, com bloqueio de documentos duplicados
 - Contagem de OS por cliente
+- Proteção contra exclusão de clientes que possuem OS vinculadas
 
-### 🛠️ Ordens de Serviço
+**Ordens de Serviço**
 
-- Cadastro de OS
-- Atualização de OS
-- Exclusão de OS
-- Consulta de OS
-- Associação de OS a clientes
-- Controle de garantia
-- Controle de valores de serviço e material
-- Cálculo do valor total
-- Controle do tipo de atendimento:
-  - Garantia
-  - Fora de Garantia
-  - Orçamento
-  - Contrato
+- Cadastro, edição, exclusão e consulta
+- Listagem de OS por cliente
+- Registro de horário de chegada e saída do técnico
+- Controle de valores de serviço e material, com cálculo automático do total
+- Controle de garantia de peça e de serviço
+- Classificação por tipo de atendimento: `GARANTIA`, `FORADEGARANTIA`, `ORCAMENTO` e `CONTRATO`
 
----
+## Pré-requisitos
 
-## 🗄️ Estrutura do Banco
+- [Node.js 22.14.0](https://nodejs.org/) (`nvm use 22.14.0`)
+- npm
+- [Docker](https://www.docker.com/) (opcional, para subir o PostgreSQL localmente)
 
-### Cliente
-
-| Campo    | Tipo   |
-| -------- | ------ |
-| nome     | String |
-| telefone | String |
-| email    | String |
-| cpf      | String |
-| cnpj     | String |
-| endereço | String |
-| cidade   | String |
-| UF       | String |
-
-### Ordem de Serviço
-
-| Campo             | Tipo    |
-| ----------------- | ------- |
-| contato           | String  |
-| modeloEquipamento | String  |
-| defeito           | String  |
-| defeitoConstatado | String  |
-| solução           | String  |
-| valorServiço      | Decimal |
-| valorMaterial     | Decimal |
-| total             | Decimal |
-| garantiaPeça      | String  |
-| garantiaServiço   | String  |
-| tipoServico       | Enum    |
-
----
-
-## 🔐 Autenticação
-
-A API utiliza JWT para autenticação.
-
-Exemplo de retorno após login:
-
-```json
-{
-  "token": "jwt_token",
-  "user": {
-    "id": "uuid",
-    "name": "Administrador"
-  }
-}
-```
-
----
-
-## ⚙️ Instalação
-
-### 1 - Clone o projeto
+## Instalação e execução
 
 ```bash
+# 1. Clone o repositório
 git clone https://github.com/sergiorbotelho/werk-os-api.git
-```
-
-### 2 - Acesse a pasta
-
-```bash
 cd werk-os-api
-```
 
-### 3 - Instale as dependências
-
-```bash
+# 2. Instale as dependências
 npm install
-```
 
-### 4 - Configure as variáveis de ambiente
+# 3. Configure as variáveis de ambiente
+cp example.env .env   # edite os valores conforme a seção abaixo
 
-Crie um arquivo `.env`
+# 4. Suba o PostgreSQL local (porta 5433)
+docker compose up -d
 
-```env
-DATABASE_URL="postgresql://usuario:senha@localhost:5432/werkos"
-JWT_SECRET="sua_chave_jwt"
-```
-
-### 5 - Execute as migrations
-
-```bash
-npx prisma migrate deploy
-```
-
-ou
-
-```bash
+# 5. Gere o Prisma Client e aplique as migrations
+npx prisma generate
 npx prisma migrate dev
-```
 
-### 6 - Inicie o servidor
+# 6. Compile e popule o banco com o usuário administrador
+npm run build
+npx prisma db seed
 
-```bash
+# 7. Inicie o servidor em modo de desenvolvimento
 npm run dev
 ```
 
----
+O seed cria o usuário inicial abaixo. Use-o para obter o primeiro token, já que o cadastro de novos usuários também exige autenticação.
 
-## 📚 Principais Endpoints
+| E-mail             | Senha    |
+| ------------------ | -------- |
+| admin@werk.com.br  | 123456   |
 
-### Autenticação
+> Troque a senha do administrador antes de usar o sistema em produção.
 
-| Método | Endpoint |
-| ------ | -------- |
-| POST   | /session |
+## Variáveis de ambiente
+
+| Variável       | Descrição                               | Exemplo                                                    |
+| -------------- | --------------------------------------- | ---------------------------------------------------------- |
+| `DATABASE_URL` | String de conexão do PostgreSQL         | `postgresql://postgres:123456@localhost:5433/dbWerk`       |
+| `JWT_SECRET`   | Chave usada para assinar os tokens JWT  | `uma_chave_longa_e_aleatoria`                              |
+| `PORT`         | Porta HTTP do servidor                  | `3333`                                                     |
+
+O exemplo de `DATABASE_URL` corresponde ao banco criado pelo `docker-compose.yml`.
+
+## Scripts
+
+| Comando               | Descrição                                                        |
+| --------------------- | ---------------------------------------------------------------- |
+| `npm run dev`         | Inicia o servidor com recarregamento automático (`ts-node-dev`)  |
+| `npm run build`       | Compila o TypeScript para `dist/` e verifica os tipos            |
+| `npm start`           | Executa a versão compilada (`dist/src/server.js`)                |
+| `npx prisma migrate dev --name <nome>` | Cria e aplica uma nova migration               |
+| `npx prisma db seed`  | Popula o banco (requer `npm run build` antes)                    |
+
+## Autenticação
+
+Todas as rotas, exceto `POST /session`, exigem um token JWT no cabeçalho:
+
+```http
+Authorization: Bearer <token>
+```
+
+**Requisição**
+
+```http
+POST /session
+Content-Type: application/json
+
+{
+  "email": "admin@werk.com.br",
+  "password": "123456"
+}
+```
+
+**Resposta `200`**
+
+```json
+{
+  "id": "uuid-do-usuario",
+  "name": "Administrador",
+  "email": "admin@werk.com.br",
+  "token": "jwt_token"
+}
+```
+
+## Endpoints
+
+### Usuários
+
+| Método | Rota       | Descrição                         |
+| ------ | ---------- | --------------------------------- |
+| POST   | `/session` | Autentica e retorna o token JWT   |
+| POST   | `/users`   | Cadastra um novo usuário          |
+| GET    | `/me`      | Retorna os dados do usuário logado |
 
 ### Clientes
 
-| Método | Endpoint      |
-| ------ | ------------- |
-| GET    | /customer     |
-| POST   | /customer     |
-| PUT    | /customer/:id |
-| DELETE | /customer/:id |
+| Método | Rota            | Descrição                                  |
+| ------ | --------------- | ------------------------------------------ |
+| GET    | `/customers`    | Lista os clientes com o total de OS de cada |
+| GET    | `/customer/:id` | Retorna um cliente                          |
+| POST   | `/customer`     | Cadastra um cliente                         |
+| PUT    | `/customer/:id` | Atualiza um cliente                         |
+| DELETE | `/customer/:id` | Exclui um cliente sem OS vinculadas         |
 
 ### Ordens de Serviço
 
-| Método | Endpoint |
-| ------ | -------- |
-| GET    | /os      |
-| GET    | /os/:id  |
-| POST   | /os      |
-| PUT    | /os/:id  |
-| DELETE | /os/:id  |
+| Método | Rota                    | Descrição                       |
+| ------ | ----------------------- | ------------------------------- |
+| GET    | `/os`                   | Lista as OS com dados do cliente |
+| GET    | `/os/:id`               | Retorna uma OS                   |
+| GET    | `/os/client/:clientId`  | Lista as OS de um cliente        |
+| POST   | `/os`                   | Cadastra uma OS                  |
+| PUT    | `/os/:id`               | Atualiza uma OS                  |
+| DELETE | `/os/:id`               | Exclui uma OS                    |
 
----
+### Erros
 
-## 🧪 Validações
+Todos os erros retornam o mesmo formato:
 
-O projeto utiliza Zod para validação dos dados recebidos pela API.
+```json
+{ "message": "Cliente não encontrado" }
+```
 
-Exemplos:
+| Status | Quando ocorre |
+| ------ | ------------- |
+| 400    | Corpo ou id inválido, JSON malformado ou regra de negócio violada |
+| 401    | Token ausente, inválido ou expirado, ou credenciais incorretas |
+| 404    | Registro não encontrado |
+| 409    | CPF/CNPJ ou e-mail já cadastrado |
+| 500    | Erro inesperado no servidor |
 
-- E-mail válido
-- CPF/CNPJ obrigatório
-- Telefone obrigatório
-- Campos mínimos obrigatórios
-- Tipos de serviço controlados por Enum
+## Modelo de dados
 
----
+O schema completo está em [`prisma/schema.prisma`](prisma/schema.prisma).
 
-## 📈 Melhorias Futuras
+### Cliente (`clients`)
 
-- Paginação
-- Filtros avançados
-- Upload de anexos
-- Histórico de alterações
-- Dashboard com indicadores
-- Relatórios PDF
-- Controle de permissões por perfil
+| Campo      | Tipo   | Observação                          |
+| ---------- | ------ | ----------------------------------- |
+| `id`       | Int    | Autoincremento                      |
+| `nome`     | String | Obrigatório                         |
+| `telefone` | String | Obrigatório                         |
+| `email`    | String |                                     |
+| `cpf`      | String | Único. Informe CPF ou CNPJ          |
+| `cnpj`     | String | Único. Informe CPF ou CNPJ          |
+| `cep`      | String |                                     |
+| `endereco` | String |                                     |
+| `numero`   | String |                                     |
+| `bairro`   | String |                                     |
+| `cidade`   | String |                                     |
+| `uf`       | String | 2 caracteres                        |
 
----
+### Ordem de Serviço (`os`)
 
-## 📄 Licença
+| Campo               | Tipo          | Observação                                  |
+| ------------------- | ------------- | ------------------------------------------- |
+| `id`                | Int           | Autoincremento                              |
+| `client_id`         | Int           | Enviado como `cliente_id` no corpo da requisição |
+| `contato`           | String        | Obrigatório                                 |
+| `modeloEquipamento` | String        | Obrigatório                                 |
+| `horaChegada`       | String        | Formato `HH:mm`                             |
+| `horaSaida`         | String        | Formato `HH:mm`, opcional                   |
+| `defeito`           | String        | Defeito relatado pelo cliente               |
+| `defeitoConstatado` | String        | Defeito identificado pelo técnico           |
+| `solucao`           | String        |                                             |
+| `valServico`        | Decimal(30,2) |                                             |
+| `valMaterial`       | Decimal(30,2) |                                             |
+| `total`             | Decimal(30,2) | `valServico + valMaterial`, calculado no cadastro |
+| `garantiaPeca`      | String        |                                             |
+| `garantiaServico`   | String        |                                             |
+| `tipoServico`       | Enum          | Padrão: `FORADEGARANTIA`                    |
 
-Este projeto foi desenvolvido para fins de estudo e portfólio.
+## Arquitetura
 
----
+```
+src/
+├── server.ts          # Inicialização do Express
+├── routers.ts         # Definição de todas as rotas
+├── middlewares/       # Autenticação e tratamento global de erros
+├── controllers/       # Camada HTTP: recebe a requisição e valida o corpo
+├── services/          # Regras de negócio e acesso ao banco via Prisma
+├── schemas/           # Schemas de validação (Zod)
+├── helpers/           # Respostas HTTP padronizadas
+├── errors/ e utils/   # Classes de erro da aplicação
+└── prisma/            # Instância única do Prisma Client
+```
 
-## 👨‍💻 Autor
+Fluxo de uma requisição:
+
+```
+rota → isAuthenticated → controller → service → Prisma → PostgreSQL
+```
+
+## Deploy
+
+O projeto é publicado na Vercel a partir do código já compilado em `dist/`. Durante o deploy, o script `vercel-build` executa `prisma generate`, `prisma migrate deploy` e `prisma db seed`.
+
+Por isso, ao alterar qualquer arquivo em `src/` ou `prisma/seed.ts`, execute `npm run build` e inclua os arquivos atualizados de `dist/` no mesmo commit.
+
+## Roadmap
+
+- [ ] Paginação nas listagens
+- [ ] Filtros avançados
+- [ ] Perfis de acesso e permissões
+- [ ] Upload de anexos
+- [ ] Histórico de alterações
+- [ ] Dashboard com indicadores
+- [ ] Relatórios em PDF
+- [ ] Testes automatizados
+
+## Licença
+
+Projeto desenvolvido para fins de estudo e portfólio.
+
+## Autor
 
 **Sergio Botelho**
 
-- GitHub: https://github.com/sergiorbotelho
-- LinkedIn: https://linkedin.com/in/sergiobotelho
+- GitHub: [@sergiorbotelho](https://github.com/sergiorbotelho)
+- LinkedIn: [sergiobotelho](https://linkedin.com/in/sergiobotelho)
