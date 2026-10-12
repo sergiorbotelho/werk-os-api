@@ -139,6 +139,7 @@ O front de hoje não usa `POST /users` nem os campos novos, então nada quebra p
   - `updateProfileSchema`: `{ name }`.
   - `changePasswordSchema`: `{ currentPassword: string obrigatória, newPassword: passwordSchema }`.
   - `authUserSchema`: **não** aplica a regra nova. Ele exige só e-mail válido e senha preenchida, para senhas antigas de 6 caracteres continuarem entrando.
+  - E-mail: `trim` e `toLowerCase` antes da validação do formato. Login e checagem de duplicidade comparam o e-mail sem diferenciar maiúsculas (`mode: "insensitive"`), porque e-mails antigos podem ter sido gravados com maiúsculas.
   - Todas as mensagens em PT-BR.
   - Exporta os tipos `z.infer` de cada schema.
 
@@ -190,7 +191,7 @@ Os botões de excluir dos modais de cliente e de OS só aparecem com `session.us
 ### Mudanças com a sessão aberta (`src/services/api/api.ts`)
 
 - **401** (usuário desativado ou token inválido): continua como hoje, com logout.
-- **403:** o interceptor chama `GET /me`. Se `mustChangePassword` estiver ligado, ele atualiza a sessão e manda para `/alterar-senha`. Senão, devolve o erro, e o toast mostra a mensagem ("Acesso negado"). A própria chamada a `/me` não passa por essa checagem (ela usa `isAuthenticatedPendingPassword` e não devolve 403), e um 403 de `POST /session` também fica de fora, para não haver laço.
+- **403:** o interceptor chama `GET /me`. Se `mustChangePassword` estiver ligado, ele manda para `/alterar-senha`, que confere o `/me` no servidor em vez da sessão. O `serverApi` faz o mesmo nas páginas renderizadas no servidor, com `redirect("/alterar-senha")`. Senão, devolve o erro, e o toast mostra a mensagem ("Acesso negado"). A própria chamada a `/me` não passa por essa checagem (ela usa `isAuthenticatedPendingPassword` e não devolve 403), e um 403 de `POST /session` também fica de fora, para não haver laço.
 - **Usuário rebaixado:** a sessão continua com o perfil antigo até o próximo login (no máximo 12 h). A API recusa as ações com "Acesso negado". Esse limite é aceito.
 
 ## Erros
