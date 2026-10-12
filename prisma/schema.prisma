@@ -19,11 +19,20 @@ enum TipoServico {
   ORCAMENTO
   CONTRATO
 }
+
+enum Role {
+  ADMIN
+  BASICO
+}
+
 model User {
   id String @id @default(uuid())
   name String @db.VarChar(255) 
   email String @db.VarChar(255) @unique
   password String @db.VarChar(255)
+  role Role @default(BASICO)
+  active Boolean @default(true)
+  mustChangePassword Boolean @default(false)
   created_at DateTime? @default(now())
   update_at DateTime?  @updatedAt
 
