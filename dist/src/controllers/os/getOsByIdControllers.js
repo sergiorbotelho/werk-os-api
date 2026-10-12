@@ -8,35 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetOsByIdController = void 0;
-const zod_1 = require("zod");
-const http_1 = require("../../helpers/http");
 const common_1 = require("../../schemas/common");
 const getOsByIdService_1 = require("../../services/os/getOsByIdService");
-const appError_1 = __importDefault(require("../../utils/appError"));
 class GetOsByIdController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const id = yield common_1.idParamSchema.parseAsync(req.params.id);
-                const getOsByIdService = new getOsByIdService_1.GetOsByIdService();
-                const os = yield getOsByIdService.execute(id);
-                return res.status(200).json(os);
-            }
-            catch (error) {
-                if (error instanceof zod_1.ZodError) {
-                    return (0, http_1.badRequest)(res, error.issues[0].message);
-                }
-                if (error instanceof appError_1.default) {
-                    return res.status(error.statusCode).json({ message: error.message });
-                }
-                console.error(error);
-                return (0, http_1.serverError)(res);
-            }
+            const id = yield common_1.idParamSchema.parseAsync(req.params.id);
+            const getOsByIdService = new getOsByIdService_1.GetOsByIdService();
+            const os = yield getOsByIdService.execute(id);
+            return res.status(200).json(os);
         });
     }
 }

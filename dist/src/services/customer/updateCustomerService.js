@@ -53,7 +53,7 @@ class UpdateCustomerService {
                     },
                 });
                 if (clientExists) {
-                    throw new appError_1.default("CPF ou CNPJ já cadastrado em outro cliente", 400);
+                    throw new appError_1.default("CPF ou CNPJ já cadastrado em outro cliente", 409);
                 }
             }
             const cliente = yield prisma_1.default.client.update({

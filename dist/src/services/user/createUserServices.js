@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateUserService = void 0;
 const bcryptjs_1 = require("bcryptjs");
-const user_1 = require("../../errors/user");
 const prisma_1 = __importDefault(require("../../prisma"));
+const appError_1 = __importDefault(require("../../utils/appError"));
 class CreateUserService {
     execute(_a) {
         return __awaiter(this, arguments, void 0, function* ({ name, email, password }) {
@@ -25,7 +25,7 @@ class CreateUserService {
                 },
             });
             if (userAlreadyExists) {
-                throw new user_1.EmailAlreadyInUseError(email);
+                throw new appError_1.default(`The e-mail ${email} is already in use.`, 409);
             }
             const passwordHash = yield (0, bcryptjs_1.hash)(password, 8);
             const user = yield prisma_1.default.user.create({

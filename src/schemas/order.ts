@@ -1,11 +1,5 @@
+import { TipoServico } from "@prisma/client";
 import { z } from "zod";
-
-export enum TipoServico {
-  GARANTIA = "GARANTIA",
-  FORADEGARANTIA = "FORADEGARANTIA",
-  ORCAMENTO = "ORCAMENTO",
-  CONTRATO = "CONTRATO",
-}
 
 const moneySchema = z.coerce
   .number({

@@ -1,17 +1,10 @@
 import { hash } from "bcryptjs";
-import { EmailAlreadyInUseError } from "../../errors/user";
 import prismaClient from "../../prisma";
+import { CreateUserInput } from "../../schemas/user";
+import AppError from "../../utils/appError";
 
-interface UserProps {
-  id?: string;
-  name: string;
-  email: string;
-  password: string;
-  created_at?: Date | string | null;
-  update_at?: Date | string | null;
-}
 export class CreateUserService {
-  async execute({ name, email, password }: UserProps) {
+  async execute({ name, email, password }: CreateUserInput) {
     const userAlreadyExists = await prismaClient.user.findFirst({
       where: {
         email: email,
@@ -19,7 +12,7 @@ export class CreateUserService {
     });
 
     if (userAlreadyExists) {
-      throw new EmailAlreadyInUseError(email);
+      throw new AppError(`The e-mail ${email} is already in use.`, 409);
     }
 
     const passwordHash = await hash(password, 8);

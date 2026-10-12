@@ -41,7 +41,7 @@ class CreateCustomerService {
                     where: { OR: documentFilters },
                 }));
             if (clientExists) {
-                throw new appError_1.default("CPF ou CNPJ Já cadastrado", 400);
+                throw new appError_1.default("CPF ou CNPJ Já cadastrado", 409);
             }
             const cliente = yield prisma_1.default.client.create({
                 data: Object.assign(Object.assign({}, data), { cpf: normalizedCpf, cnpj: normalizedCnpj }),

@@ -1,21 +1,11 @@
 import { Request, Response } from "express";
-import { serverError } from "../../helpers/http";
 import { GetCustomersServices } from "../../services/customer/getCustomersServices";
-import AppError from "../../utils/appError";
 
 export class GetCustomersControllers {
   async handle(req: Request, res: Response) {
-    try {
-      const getCustomersServices = new GetCustomersServices();
+    const getCustomersServices = new GetCustomersServices();
+    const customers = await getCustomersServices.execute();
 
-      const customers = await getCustomersServices.execute();
-
-      return res.status(200).json(customers);
-    } catch (error) {
-      if (error instanceof AppError) {
-        return res.status(error.statusCode).json({ message: error.message });
-      }
-      return serverError(res);
-    }
+    return res.status(200).json(customers);
   }
 }

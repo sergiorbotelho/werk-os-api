@@ -37,7 +37,7 @@ export class UpdateCustomerService {
       });
 
       if (clientExists) {
-        throw new AppError("CPF ou CNPJ já cadastrado em outro cliente", 400);
+        throw new AppError("CPF ou CNPJ já cadastrado em outro cliente", 409);
       }
     }
 

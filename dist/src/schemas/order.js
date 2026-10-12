@@ -1,14 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createOrUpdateServiceSchema = exports.TipoServico = void 0;
+exports.createOrUpdateServiceSchema = void 0;
+const client_1 = require("@prisma/client");
 const zod_1 = require("zod");
-var TipoServico;
-(function (TipoServico) {
-    TipoServico["GARANTIA"] = "GARANTIA";
-    TipoServico["FORADEGARANTIA"] = "FORADEGARANTIA";
-    TipoServico["ORCAMENTO"] = "ORCAMENTO";
-    TipoServico["CONTRATO"] = "CONTRATO";
-})(TipoServico || (exports.TipoServico = TipoServico = {}));
 const moneySchema = zod_1.z.coerce
     .number({
     error: "Valor inválido",
@@ -20,7 +14,7 @@ const moneySchema = zod_1.z.coerce
 const horaRegex = /^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/;
 exports.createOrUpdateServiceSchema = zod_1.z.object({
     cliente_id: zod_1.z.coerce.number().int(),
-    tipoServico: zod_1.z.enum(TipoServico, {
+    tipoServico: zod_1.z.enum(client_1.TipoServico, {
         error: "Tipo de serviço inválido, deve ser GARANTIA, FORADEGARANTIA, ORCAMENTO ou CONTRATO",
     }),
     contato: zod_1.z.string().trim().min(1, "Contato é obrigatório"),

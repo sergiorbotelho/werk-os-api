@@ -19,7 +19,7 @@ export class CreateCustomerService {
       }));
 
     if (clientExists) {
-      throw new AppError("CPF ou CNPJ Já cadastrado", 400);
+      throw new AppError("CPF ou CNPJ Já cadastrado", 409);
     }
 
     const cliente = await prismaClient.client.create({

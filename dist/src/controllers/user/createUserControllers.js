@@ -10,30 +10,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateUserController = void 0;
-const zod_1 = require("zod");
-const user_1 = require("../../errors/user");
-const http_1 = require("../../helpers/http");
-const user_2 = require("../../schemas/user");
+const user_1 = require("../../schemas/user");
 const createUserServices_1 = require("../../services/user/createUserServices");
 class CreateUserController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const params = req.body;
-                yield user_2.createUserSchema.parseAsync(params);
-                const createUserService = new createUserServices_1.CreateUserService();
-                const user = yield createUserService.execute(params);
-                return res.status(201).json(user);
-            }
-            catch (error) {
-                if (error instanceof zod_1.ZodError) {
-                    return (0, http_1.badRequest)(res, error.issues[0].message);
-                }
-                if (error instanceof user_1.EmailAlreadyInUseError) {
-                    return (0, http_1.badRequest)(res, error.message);
-                }
-                return (0, http_1.serverError)(res);
-            }
+            const data = yield user_1.createUserSchema.parseAsync(req.body);
+            const createUserService = new createUserServices_1.CreateUserService();
+            const user = yield createUserService.execute(data);
+            return res.status(201).json(user);
         });
     }
 }
