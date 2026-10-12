@@ -54,7 +54,7 @@ Regras:
 - **Sempre** passe ao service o resultado do `parseAsync` (`data`), nunca o `req.body` cru. Só assim o `trim` e o `coerce` do Zod chegam ao service.
 - Todo endpoint com corpo valida o corpo com um schema. Ids de rota são validados com `idParamSchema` (`src/schemas/common.ts`).
 - O service recebe o id como `number`, nunca string, e não chama `parseInt`.
-- Sempre use `return res.status(...).json(...)`.
+- Sempre use `return res.status(...).json(...)`. Respostas binárias (como PDF) definem `Content-Type` e usam `return res.status(...).send(buffer)`.
 - Status de sucesso: `201` para criação, `200` para leitura, atualização e exclusão.
 
 ## Service

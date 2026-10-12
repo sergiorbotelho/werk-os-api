@@ -9,6 +9,7 @@ import { DeleteOsController } from "./controllers/os/deleteOsControllers";
 import { GetAllOsByController } from "./controllers/os/getAllOsByClientControllers";
 import { GetAllOsController } from "./controllers/os/getAllOsControllers";
 import { GetOsByIdController } from "./controllers/os/getOsByIdControllers";
+import { GetOsPdfController } from "./controllers/os/getOsPdfController";
 import { UpdateOsControllers } from "./controllers/os/updateOsControlles";
 import { authUserControllers } from "./controllers/user/authUserControllers";
 import { CreateUserController } from "./controllers/user/createUserControllers";
@@ -51,6 +52,7 @@ router.put(
 router.get("/os", isAuthenticated, new GetAllOsController().handle);
 
 router.get("/os/:id", isAuthenticated, new GetOsByIdController().handle);
+router.get("/os/:id/pdf", isAuthenticated, new GetOsPdfController().handle);
 router.get(
   "/os/client/:clientId",
   isAuthenticated,

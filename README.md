@@ -180,6 +180,7 @@ Content-Type: application/json
 | ------ | ----------------------- | ------------------------------- |
 | GET    | `/os`                   | Lista as OS com dados do cliente |
 | GET    | `/os/:id`               | Retorna uma OS                   |
+| GET    | `/os/:id/pdf`           | Gera o PDF da OS                 |
 | GET    | `/os/client/:clientId`  | Lista as OS de um cliente        |
 | POST   | `/os`                   | Cadastra uma OS                  |
 | PUT    | `/os/:id`               | Atualiza uma OS                  |

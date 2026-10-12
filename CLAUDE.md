@@ -62,6 +62,8 @@ Business rules in services:
 - `Os.total` is `valServico + valMaterial`, computed with `Prisma.Decimal` on create and on update. On update, a money field missing from the body keeps its stored value.
 - No list endpoint is paginated. Pagination code is commented out in the services.
 
+The OS PDF is built by `src/reports/osPdf.ts` (`buildOsPdfDefinition`, a pure function ported from the front end's `pdfOrder.tsx`) and rendered by `src/lib/pdf.ts` (`renderPdf`, pdfmake 0.2.13 server API with the Roboto fonts from `pdfmake/build/vfs_fonts`). The logo is embedded as base64 in `src/reports/logo.ts`, because `tsc` does not copy images into `dist/`. Dates use the `America/Recife` time zone, since Vercel runs in UTC.
+
 ### Response shapes
 
 The front end (`werk-app`, Next.js) depends on these shapes, which are inconsistent:
@@ -73,6 +75,7 @@ The front end (`werk-app`, Next.js) depends on these shapes, which are inconsist
 | `GET /os` | `{ os: [...] }`, each with the full `client` |
 | `GET /os/client/:clientId` | `{ os: [...], count }`, with `count` of this client's OS |
 | `GET /os/:id` | the OS object (with `id` and `tipoServico`, without `client`), 404 if missing |
+| `GET /os/:id/pdf` | the OS PDF (`application/pdf`, `inline`, `no-store`), generated on every request; 404 if missing |
 | `POST /customer` | the customer object (201) |
 | `POST /os` | `{ os }` (201) |
 | `POST /users` | `{ user }` (201) |

@@ -12,6 +12,7 @@ const deleteOsControllers_1 = require("./controllers/os/deleteOsControllers");
 const getAllOsByClientControllers_1 = require("./controllers/os/getAllOsByClientControllers");
 const getAllOsControllers_1 = require("./controllers/os/getAllOsControllers");
 const getOsByIdControllers_1 = require("./controllers/os/getOsByIdControllers");
+const getOsPdfController_1 = require("./controllers/os/getOsPdfController");
 const updateOsControlles_1 = require("./controllers/os/updateOsControlles");
 const authUserControllers_1 = require("./controllers/user/authUserControllers");
 const createUserControllers_1 = require("./controllers/user/createUserControllers");
@@ -29,6 +30,7 @@ router.delete("/customer/:id", isAuthenticated_1.isAuthenticated, new deleteCust
 router.put("/customer/:id", isAuthenticated_1.isAuthenticated, new updateCustomerControllers_1.UpdateCustomerController().handle);
 router.get("/os", isAuthenticated_1.isAuthenticated, new getAllOsControllers_1.GetAllOsController().handle);
 router.get("/os/:id", isAuthenticated_1.isAuthenticated, new getOsByIdControllers_1.GetOsByIdController().handle);
+router.get("/os/:id/pdf", isAuthenticated_1.isAuthenticated, new getOsPdfController_1.GetOsPdfController().handle);
 router.get("/os/client/:clientId", isAuthenticated_1.isAuthenticated, new getAllOsByClientControllers_1.GetAllOsByController().handle);
 router.put("/os/:id", isAuthenticated_1.isAuthenticated, new updateOsControlles_1.UpdateOsControllers().handle);
 router.post("/os", isAuthenticated_1.isAuthenticated, new createOsControllers_1.CreateOsControllers().handle);
