@@ -14,19 +14,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DetailUserService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
+const appError_1 = __importDefault(require("../../utils/appError"));
+const userSelect_1 = require("./userSelect");
 class DetailUserService {
     execute(user_id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = prisma_1.default.user.findFirst({
+            const user = yield prisma_1.default.user.findUnique({
                 where: {
                     id: user_id,
                 },
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                },
+                select: userSelect_1.profileSelect,
             });
+            if (!user) {
+                throw new appError_1.default("Usuário não encontrado", 404);
+            }
             return user;
         });
     }

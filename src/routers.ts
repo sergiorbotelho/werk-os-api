@@ -12,9 +12,13 @@ import { GetOsByIdController } from "./controllers/os/getOsByIdControllers";
 import { GetOsPdfController } from "./controllers/os/getOsPdfController";
 import { UpdateOsControllers } from "./controllers/os/updateOsControlles";
 import { authUserControllers } from "./controllers/user/authUserControllers";
+import { ChangePasswordController } from "./controllers/user/changePasswordController";
 import { CreateUserController } from "./controllers/user/createUserControllers";
 import { detailUserController } from "./controllers/user/detailUserControllers";
-import { isAuthenticated } from "./middlewares/isAuthenticated";
+import {
+  isAuthenticated,
+  isAuthenticatedPendingPassword,
+} from "./middlewares/isAuthenticated";
 
 const router = Router();
 
@@ -22,7 +26,16 @@ router.post("/users", isAuthenticated, new CreateUserController().handle);
 
 router.post("/session", new authUserControllers().handle);
 
-router.get("/me", isAuthenticated, new detailUserController().handle);
+router.get(
+  "/me",
+  isAuthenticatedPendingPassword,
+  new detailUserController().handle,
+);
+router.put(
+  "/me/password",
+  isAuthenticatedPendingPassword,
+  new ChangePasswordController().handle,
+);
 
 router.post(
   "/customer",

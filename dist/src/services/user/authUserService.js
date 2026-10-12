@@ -20,17 +20,21 @@ const appError_1 = __importDefault(require("../../utils/appError"));
 class AuthUserService {
     execute(_a) {
         return __awaiter(this, arguments, void 0, function* ({ email, password }) {
+            // Sem diferenciar maiúsculas: e-mails antigos podem ter sido gravados com maiúsculas
             const user = yield prisma_1.default.user.findFirst({
                 where: {
-                    email: email,
+                    email: { equals: email, mode: "insensitive" },
                 },
             });
             if (!user) {
-                throw new appError_1.default("User/password incorrect", 401);
+                throw new appError_1.default("E-mail ou senha incorretos", 401);
             }
             const passwordMatch = yield (0, bcryptjs_1.compare)(password, user.password);
             if (!passwordMatch) {
-                throw new appError_1.default("User/password incorrect", 401);
+                throw new appError_1.default("E-mail ou senha incorretos", 401);
+            }
+            if (!user.active) {
+                throw new appError_1.default("Usuário desativado. Fale com o administrador.", 403);
             }
             const token = (0, jsonwebtoken_1.sign)({
                 name: user.name,
@@ -43,6 +47,8 @@ class AuthUserService {
                 id: user.id,
                 name: user.name,
                 email: user.email,
+                role: user.role,
+                mustChangePassword: user.mustChangePassword,
                 token: token,
             };
         });
