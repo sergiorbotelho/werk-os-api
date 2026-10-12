@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-Werk OS API: an Express + TypeScript + Prisma (PostgreSQL) REST API for a repair shop. It manages service orders ("OS", Ordem de Serviço), customers (`Client`), and users. Domain names, field names, and the customer/OS error messages are in Portuguese (`nome`, `telefone`, `defeito`, `valServico`, "Cliente não encontrado"). Keep new code consistent with that. The user/auth code is the exception: its Zod and error messages are in English.
+Werk OS API: an Express + TypeScript + Prisma (PostgreSQL) REST API for a repair shop. It manages service orders ("OS", Ordem de Serviço), customers (`Client`), and users. Domain names, field names, and the customer/OS error messages are in Portuguese (`nome`, `telefone`, `defeito`, `valServico`, "Cliente não encontrado"). Keep new code consistent with that. Every message that can reach the screen (Zod and `AppError` messages, in every domain including user/auth) is in Brazilian Portuguese. The user domain keeps English identifiers and field names (`name`, `role`, `mustChangePassword`), and logs and commit messages stay in English.
 
 ## Commands
 
@@ -78,20 +78,30 @@ The front end (`werk-app`, Next.js) depends on these shapes, which are inconsist
 | `GET /os/:id/pdf` | the OS PDF (`application/pdf`, `inline`, `no-store`), generated on every request; 404 if missing |
 | `POST /customer` | the customer object (201) |
 | `POST /os` | `{ os }` (201) |
-| `POST /users` | `{ user }` (201) |
-| `POST /session` | `{ id, name, email, token }` |
+| `POST /users` | `{ user, temporaryPassword }` (201) |
+| `POST /session` | `{ id, name, email, role, mustChangePassword, token }` |
 | `PUT /customer/:id`, `PUT /os/:id` | the updated record (200) |
+| `GET /me`, `PUT /me` | `{ id, name, email, role, mustChangePassword }` |
+| `PUT /me/password` | `{ message }` |
+| `GET /users` | `{ users: [...], count }`, each without `password` |
+| `PUT /users/:id` | the updated user |
+| `POST /users/:id/reset-password` | `{ temporaryPassword }` |
 | `DELETE` routes | `{ message }` |
 
 ### Auth
 
-`POST /session` returns a JWT (30-day expiry, `sub` = user id). `isAuthenticated` expects `Authorization: Bearer <token>` and sets `req.user_id`, which is typed through `src/@types/express/index.d.ts` (`typeRoots` in tsconfig). Every route except `/session` requires a token, including `POST /users`. Because of that, the first user has to come from the seed: `admin@werk.com.br` / `123456`. There are no roles. Every authenticated user can see and change all data.
+`POST /session` returns a JWT (30-day expiry, `sub` = user id), plus `role` and `mustChangePassword`. Email lookup at login is case-insensitive, and the login does not apply the new password rule, so old 6-character passwords still work.
+
+`isAuthenticated` expects `Authorization: Bearer <token>` and reads the user from the database on every request (`role`, `active`, `mustChangePassword`). A missing or inactive user gets 401, and a user with `mustChangePassword` gets 403 "Troca de senha obrigatória". It sets `req.user_id` and `req.user_role`, typed through `src/@types/express/index.d.ts` (`typeRoots` in tsconfig). `isAuthenticatedPendingPassword` is the same but lets a pending user through; only `GET /me` and `PUT /me/password` use it. `requireAdmin` goes after `isAuthenticated` and returns 403 "Acesso negado" for non-admins.
+
+Roles (`Role` enum): `ADMIN` can do everything. `BASICO` can read everything and create and edit customers and OS, but cannot delete customers or OS or manage users. Admins create users with `POST /users`, which generates a temporary password (`src/utils/generateTemporaryPassword.ts`) returned once and sets `mustChangePassword`. `POST /users/:id/reset-password` does the same for an existing user. An admin cannot change their own `role` or `active`, which guarantees at least one active admin. Users are deactivated, never deleted. The first admin comes from the seed: `admin@werk.com.br` / `123456`, and the seed forces a password change while that password is unchanged. New passwords need 8–72 characters with at least one letter and one digit (`passwordSchema`).
 
 ### Data model
 
 The schema is in `prisma/schema.prisma`.
 
 - `User` uses UUID ids. `Client` and `Os` use autoincrement ints.
+- `User.role` (`ADMIN` | `BASICO`, default `BASICO`), `User.active` (default `true`) and `User.mustChangePassword` (default `false`).
 - `Client.cpf` and `Client.cnpj` are optional but unique, and at least one of them is required. CPF/CNPJ are validated with `cpf-cnpj-validator` in `src/schemas/customer.ts`, using `createCustomerSchema` and `updateCustomerSchema`. Only the create schema enforces "at least one"; the update service enforces it too.
 - OS request bodies use `cliente_id`, and services map it to the Prisma column `client_id`.
 - `TipoServico` is a Prisma enum. `src/schemas/order.ts` imports it from `@prisma/client`.

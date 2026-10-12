@@ -41,9 +41,11 @@ API REST para gestão de **Ordens de Serviço (OS)**, clientes e usuários de as
 
 **Usuários**
 
-- Cadastro de usuários com senha criptografada (bcrypt)
+- Perfis **Admin** e **Básico**. O Básico cadastra e edita clientes e OS; só o Admin exclui clientes e OS e gerencia usuários
+- Cadastro de usuários pelo admin, com senha temporária gerada pelo sistema e troca obrigatória no primeiro acesso
+- Edição de nome e perfil, desativação e redefinição de senha pelo admin
+- Perfil do usuário: alteração do próprio nome e da própria senha (mínimo de 8 caracteres, com letra e número)
 - Login com emissão de token JWT (validade de 30 dias)
-- Consulta do usuário autenticado
 
 **Clientes**
 
@@ -95,13 +97,11 @@ npx prisma db seed
 npm run dev
 ```
 
-O seed cria o usuário inicial abaixo. Use-o para obter o primeiro token, já que o cadastro de novos usuários também exige autenticação.
+O seed cria o administrador inicial abaixo. Só um admin cadastra usuários, então use-o para o primeiro acesso. Enquanto a senha dele for `123456`, o sistema obriga a troca no login.
 
 | E-mail             | Senha    |
 | ------------------ | -------- |
 | admin@werk.com.br  | 123456   |
-
-> Troque a senha do administrador antes de usar o sistema em produção.
 
 ## Variáveis de ambiente
 
@@ -125,7 +125,7 @@ O exemplo de `DATABASE_URL` corresponde ao banco criado pelo `docker-compose.yml
 
 ## Autenticação
 
-Todas as rotas, exceto `POST /session`, exigem um token JWT no cabeçalho:
+Todas as rotas, exceto `POST /session`, exigem um token JWT no cabeçalho. A API consulta o usuário a cada requisição: um usuário desativado recebe 401 na hora, e quem tem a troca de senha pendente só acessa `GET /me` e `PUT /me/password` (as demais rotas respondem 403).
 
 ```http
 Authorization: Bearer <token>
@@ -150,6 +150,8 @@ Content-Type: application/json
   "id": "uuid-do-usuario",
   "name": "Administrador",
   "email": "admin@werk.com.br",
+  "role": "ADMIN",
+  "mustChangePassword": false,
   "token": "jwt_token"
 }
 ```
@@ -158,11 +160,16 @@ Content-Type: application/json
 
 ### Usuários
 
-| Método | Rota       | Descrição                         |
-| ------ | ---------- | --------------------------------- |
-| POST   | `/session` | Autentica e retorna o token JWT   |
-| POST   | `/users`   | Cadastra um novo usuário          |
-| GET    | `/me`      | Retorna os dados do usuário logado |
+| Método | Rota                         | Acesso | Descrição |
+| ------ | ---------------------------- | ------ | --------- |
+| POST   | `/session`                   | público | Autentica e retorna o token JWT |
+| GET    | `/me`                        | logado | Dados do usuário logado (`role`, `mustChangePassword`) |
+| PUT    | `/me`                        | logado | Altera o próprio nome |
+| PUT    | `/me/password`               | logado | Troca a própria senha (`currentPassword`, `newPassword`) |
+| GET    | `/users`                     | admin  | Lista os usuários: `{ users, count }` |
+| POST   | `/users`                     | admin  | Cadastra (`name`, `email`, `role`) e devolve `{ user, temporaryPassword }` |
+| PUT    | `/users/:id`                 | admin  | Altera `name`, `role` e `active` |
+| POST   | `/users/:id/reset-password`  | admin  | Gera nova senha temporária: `{ temporaryPassword }` |
 
 ### Clientes
 
@@ -172,7 +179,7 @@ Content-Type: application/json
 | GET    | `/customer/:id` | Retorna um cliente                          |
 | POST   | `/customer`     | Cadastra um cliente                         |
 | PUT    | `/customer/:id` | Atualiza um cliente                         |
-| DELETE | `/customer/:id` | Exclui um cliente sem OS vinculadas         |
+| DELETE | `/customer/:id` | Exclui um cliente sem OS vinculadas (somente admin) |
 
 ### Ordens de Serviço
 
@@ -184,7 +191,7 @@ Content-Type: application/json
 | GET    | `/os/client/:clientId`  | Lista as OS de um cliente        |
 | POST   | `/os`                   | Cadastra uma OS                  |
 | PUT    | `/os/:id`               | Atualiza uma OS                  |
-| DELETE | `/os/:id`               | Exclui uma OS                    |
+| DELETE | `/os/:id`               | Exclui uma OS (somente admin)    |
 
 ### Erros
 
@@ -198,6 +205,7 @@ Todos os erros retornam o mesmo formato:
 | ------ | ------------- |
 | 400    | Corpo ou id inválido, JSON malformado ou regra de negócio violada |
 | 401    | Token ausente, inválido ou expirado, ou credenciais incorretas |
+| 403    | Ação exclusiva de admin, troca de senha pendente ou login de usuário desativado |
 | 404    | Registro não encontrado |
 | 409    | CPF/CNPJ ou e-mail já cadastrado |
 | 500    | Erro inesperado no servidor |
@@ -261,7 +269,7 @@ src/
 Fluxo de uma requisição:
 
 ```
-rota → isAuthenticated → controller → service → Prisma → PostgreSQL
+rota → isAuthenticated → requireAdmin (rotas de admin) → controller → service → Prisma → PostgreSQL
 ```
 
 ## Deploy
@@ -274,12 +282,13 @@ Por isso, ao alterar qualquer arquivo em `src/` ou `prisma/seed.ts`, execute `np
 
 - [ ] Paginação nas listagens
 - [ ] Filtros avançados
-- [ ] Perfis de acesso e permissões
+- [x] Perfis de acesso e permissões
 - [ ] Upload de anexos
 - [ ] Histórico de alterações
 - [ ] Dashboard com indicadores
 - [ ] Relatórios em PDF
 - [ ] Testes automatizados
+- [ ] Backup e restauração do banco (somente admin)
 
 ## Licença
 

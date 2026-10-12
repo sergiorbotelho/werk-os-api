@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { UpdateProfileController } from "./controllers/user/updateProfileController";
 import { CreateCustomerController } from "./controllers/customer/createCustomerControllers";
 import { DeleteCustomerController } from "./controllers/customer/deleteCustomerControllers";
 import { GetClientByIdControllers } from "./controllers/customer/getCustomerByIdControllers";
@@ -58,6 +59,7 @@ router.get(
   isAuthenticatedPendingPassword,
   new detailUserController().handle,
 );
+router.put("/me", isAuthenticated, new UpdateProfileController().handle);
 router.put(
   "/me/password",
   isAuthenticatedPendingPassword,

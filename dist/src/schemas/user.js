@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.changePasswordSchema = exports.authUserSchema = exports.updateUserSchema = exports.createUserSchema = exports.passwordSchema = exports.nameSchema = exports.emailSchema = void 0;
+exports.updateProfileSchema = exports.changePasswordSchema = exports.authUserSchema = exports.updateUserSchema = exports.createUserSchema = exports.passwordSchema = exports.nameSchema = exports.emailSchema = void 0;
 const client_1 = require("@prisma/client");
 const zod_1 = require("zod");
 // trim e toLowerCase antes do formato: " Maria@Werk.com " vira "maria@werk.com"
@@ -49,4 +49,7 @@ exports.changePasswordSchema = zod_1.z.object({
         .string({ error: "Senha atual é obrigatória" })
         .min(1, { error: "Senha atual é obrigatória" }),
     newPassword: exports.passwordSchema,
+});
+exports.updateProfileSchema = zod_1.z.object({
+    name: exports.nameSchema,
 });

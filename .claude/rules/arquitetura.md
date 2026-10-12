@@ -12,19 +12,20 @@ routers.ts → isAuthenticated → Controller → Service → prismaClient
 
 | Camada | Local | Responsabilidade | Não faz |
 | --- | --- | --- | --- |
-| Rota | `src/routers.ts` | Registra método, caminho, `isAuthenticated` e `new XController().handle` | Lógica |
+| Rota | `src/routers.ts` | Registra método, caminho, `isAuthenticated` (mais `requireAdmin` nas rotas só de admin) e `new XController().handle` | Lógica |
 | Controller | `src/controllers/<dominio>/` | Lê `req`, valida com Zod, chama o service, escolhe o status de sucesso | Acessar Prisma, regra de negócio, tratar erros |
 | Erros | `src/middlewares/erroHandle.ts` | Converte qualquer erro em status + `{ message }` | — |
 | Service | `src/services/<dominio>/` | Regra de negócio e acesso ao banco; lança `AppError` em falhas esperadas | Conhecer `req`/`res`, status de sucesso |
 | Schema | `src/schemas/<dominio>.ts` | Schemas Zod v4 e tipos derivados (`z.infer`) | — |
 
-Um controller e um service por caso de uso. Toda rota, exceto `/session`, usa `isAuthenticated`.
+Um controller e um service por caso de uso. Toda rota, exceto `/session`, usa `isAuthenticated`. Rotas exclusivas de admin acrescentam `requireAdmin` logo depois. Só `GET /me` e `PUT /me/password` usam `isAuthenticatedPendingPassword`, que deixa passar quem ainda precisa trocar a senha temporária.
 
 ## Nomes
 
 - Arquivos em camelCase, no singular: `createProductController.ts`, `createProductService.ts`.
 - Classes em PascalCase, no singular: `CreateProductController`, `CreateProductService`.
-- Pasta por domínio em inglês (`customer`, `os`, `user`). Campos e mensagens seguem o domínio em português (`nome`, `telefone`, "Cliente não encontrado"), exceto o domínio de usuário/auth, que é em inglês.
+- Pasta por domínio em inglês (`customer`, `os`, `user`). Os campos seguem o domínio: português em cliente e OS (`nome`, `telefone`) e inglês em usuário/auth (`name`, `role`).
+- Toda mensagem que pode chegar à tela (Zod e `AppError`) é em PT-BR, em todos os domínios, inclusive usuário/auth. Logs, identificadores e commits ficam em inglês.
 - Não copie os nomes legados com erro de digitação ou plural (`deleteCustomerServic.ts`, `updateOsControlles.ts`, `erroHandle.ts`, `authUserControllers`, `GetCustomersServices`).
 
 ## Controller
@@ -91,7 +92,7 @@ Regras:
 
 ## Schema
 
-- Zod v4 (`{ error: "..." }`), com mensagens no idioma do domínio.
+- Zod v4 (`{ error: "..." }`), com mensagens em PT-BR.
 - Exporte o schema e o tipo inferido juntos.
 - Um enum que existe no Prisma deve ser importado de `@prisma/client` (`z.enum(TipoServico)`) em vez de redefinido em TypeScript.
 

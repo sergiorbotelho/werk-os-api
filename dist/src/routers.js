@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.router = void 0;
 const express_1 = require("express");
+const updateProfileController_1 = require("./controllers/user/updateProfileController");
 const createCustomerControllers_1 = require("./controllers/customer/createCustomerControllers");
 const deleteCustomerControllers_1 = require("./controllers/customer/deleteCustomerControllers");
 const getCustomerByIdControllers_1 = require("./controllers/customer/getCustomerByIdControllers");
@@ -31,6 +32,7 @@ router.put("/users/:id", isAuthenticated_1.isAuthenticated, requireAdmin_1.requi
 router.post("/users/:id/reset-password", isAuthenticated_1.isAuthenticated, requireAdmin_1.requireAdmin, new resetUserPasswordController_1.ResetUserPasswordController().handle);
 router.post("/session", new authUserControllers_1.authUserControllers().handle);
 router.get("/me", isAuthenticated_1.isAuthenticatedPendingPassword, new detailUserControllers_1.detailUserController().handle);
+router.put("/me", isAuthenticated_1.isAuthenticated, new updateProfileController_1.UpdateProfileController().handle);
 router.put("/me/password", isAuthenticated_1.isAuthenticatedPendingPassword, new changePasswordController_1.ChangePasswordController().handle);
 router.post("/customer", isAuthenticated_1.isAuthenticated, new createCustomerControllers_1.CreateCustomerController().handle);
 router.get("/customer/:id", isAuthenticated_1.isAuthenticated, new getCustomerByIdControllers_1.GetClientByIdControllers().handle);

@@ -56,7 +56,12 @@ export const changePasswordSchema = z.object({
   newPassword: passwordSchema,
 });
 
+export const updateProfileSchema = z.object({
+  name: nameSchema,
+});
+
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 export type AuthUserInput = z.infer<typeof authUserSchema>;
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
