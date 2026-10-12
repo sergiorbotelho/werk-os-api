@@ -17,12 +17,12 @@ const prisma_1 = __importDefault(require("../../prisma"));
 class GetAllOsByClientService {
     execute(clientId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const count = yield prisma_1.default.os.count();
+            const count = yield prisma_1.default.os.count({
+                where: { client_id: clientId },
+            });
             const os = yield prisma_1.default.os.findMany({
                 where: {
-                    client_id: {
-                        equals: parseInt(clientId),
-                    },
+                    client_id: clientId,
                 },
                 select: {
                     id: true,

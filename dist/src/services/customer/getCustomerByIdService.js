@@ -14,15 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetCustomerByIdService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
+const appError_1 = __importDefault(require("../../utils/appError"));
 class GetCustomerByIdService {
     execute(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const client = prisma_1.default.client.findMany({
-                where: {
-                    id: {
-                        equals: parseInt(id),
-                    },
-                },
+            const client = yield prisma_1.default.client.findUnique({
+                where: { id },
                 select: {
                     id: true,
                     nome: true,
@@ -38,6 +35,9 @@ class GetCustomerByIdService {
                     cep: true,
                 },
             });
+            if (!client) {
+                throw new appError_1.default("Cliente não encontrado", 404);
+            }
             return client;
         });
     }

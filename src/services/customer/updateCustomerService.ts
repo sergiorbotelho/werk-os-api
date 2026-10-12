@@ -1,42 +1,19 @@
 import prismaClient from "../../prisma";
+import { UpdateCustomerInput } from "../../schemas/customer";
 import AppError from "../../utils/appError";
 
-interface ClientProps {
+interface UpdateCustomerProps extends UpdateCustomerInput {
   id: number;
-  nome: string;
-  email: string;
-  telefone: string;
-  cpf?: string | null;
-  cnpj?: string | null;
-  cep: string;
-  endereco: string;
-  numero: string;
-  bairro: string;
-  cidade: string;
-  uf: string;
 }
 
 export class UpdateCustomerService {
-  async execute({
-    id,
-    nome,
-    telefone,
-    email,
-    cpf,
-    cnpj,
-    cep,
-    endereco,
-    numero,
-    bairro,
-    cidade,
-    uf,
-  }: ClientProps) {
+  async execute({ id, cpf, cnpj, ...data }: UpdateCustomerProps) {
     const existingClient = await prismaClient.client.findUnique({
       where: { id },
     });
 
     if (!existingClient) {
-      throw new AppError("Cliente não encontrado", 400);
+      throw new AppError("Cliente não encontrado", 404);
     }
 
     const normalizedCpf = cpf?.trim() || null;
@@ -53,8 +30,8 @@ export class UpdateCustomerService {
         where: {
           id: { not: id },
           OR: [
-            normalizedCpf ? { cpf: normalizedCpf } : {},
-            normalizedCnpj ? { cnpj: normalizedCnpj } : {},
+            ...(normalizedCpf ? [{ cpf: normalizedCpf }] : []),
+            ...(normalizedCnpj ? [{ cnpj: normalizedCnpj }] : []),
           ],
         },
       });
@@ -69,17 +46,9 @@ export class UpdateCustomerService {
         id,
       },
       data: {
-        nome,
-        telefone,
-        email,
+        ...data,
         cpf: normalizedCpf,
         cnpj: normalizedCnpj,
-        cep,
-        endereco,
-        numero,
-        bairro,
-        cidade,
-        uf,
       },
     });
 

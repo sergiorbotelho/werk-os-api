@@ -1,49 +1,24 @@
+import { Prisma } from "@prisma/client";
 import prismaClient from "../../prisma";
-
-interface RequestProps {
-  contato: string;
-  horaChegada: string;
-  horaSaida: string;
-  modeloEquipamento: string;
-  defeito: string;
-  defeitoConstatado: string;
-  solucao: string;
-  valServico: number;
-  valMaterial: number;
-  garantiaPeca: string;
-  garantiaServico: string;
-  cliente_id: number;
-}
+import { OrdemServicoSchema } from "../../schemas/order";
+import AppError from "../../utils/appError";
 
 export class CreateOsService {
-  async execute({
-    contato,
-    horaChegada,
-    horaSaida,
-    modeloEquipamento,
-    defeito,
-    defeitoConstatado,
-    solucao,
-    valServico,
-    valMaterial,
-    garantiaPeca,
-    garantiaServico,
-    cliente_id,
-  }: RequestProps) {
+  async execute({ cliente_id, ...data }: OrdemServicoSchema) {
+    const client = await prismaClient.client.findUnique({
+      where: { id: cliente_id },
+    });
+
+    if (!client) {
+      throw new AppError("Cliente não encontrado", 404);
+    }
+
     const os = await prismaClient.os.create({
       data: {
-        contato: contato,
-        horaChegada: horaChegada,
-        horaSaida: horaSaida,
-        modeloEquipamento: modeloEquipamento,
-        defeito: defeito,
-        defeitoConstatado: defeitoConstatado,
-        solucao: solucao,
-        valServico: valServico,
-        valMaterial: valMaterial,
-        total: valServico + valMaterial,
-        garantiaPeca: garantiaPeca,
-        garantiaServico: garantiaServico,
+        ...data,
+        total: new Prisma.Decimal(data.valServico ?? 0).plus(
+          data.valMaterial ?? 0,
+        ),
         client_id: cliente_id,
       },
     });

@@ -1,40 +1,22 @@
 import prismaClient from "../../prisma";
+import { CreateCustomerInput } from "../../schemas/customer";
 import AppError from "../../utils/appError";
 
-interface CustomerProps {
-  nome: string;
-  telefone: string;
-  email: string;
-  cpf?: string | null;
-  cnpj?: string | null;
-  cep: string;
-  endereco: string;
-  numero: string;
-  bairro: string;
-  cidade: string;
-  uf: string;
-  created_at?: Date | string | null;
-  update_at?: Date | string | null;
-}
 export class CreateCustomerService {
-  async execute({
-    nome,
-    telefone,
-    email,
-    cpf,
-    cnpj,
-    cep,
-    endereco,
-    numero,
-    bairro,
-    cidade,
-    uf,
-  }: CustomerProps) {
-    const clientExists = await prismaClient.client.findFirst({
-      where: {
-        OR: [{ cpf: cpf }, { cnpj: cnpj }],
-      },
-    });
+  async execute({ cpf, cnpj, ...data }: CreateCustomerInput) {
+    const normalizedCpf = cpf?.trim() || null;
+    const normalizedCnpj = cnpj?.trim() || null;
+
+    const documentFilters = [
+      ...(normalizedCpf ? [{ cpf: normalizedCpf }] : []),
+      ...(normalizedCnpj ? [{ cnpj: normalizedCnpj }] : []),
+    ];
+
+    const clientExists =
+      documentFilters.length > 0 &&
+      (await prismaClient.client.findFirst({
+        where: { OR: documentFilters },
+      }));
 
     if (clientExists) {
       throw new AppError("CPF ou CNPJ Já cadastrado", 400);
@@ -42,17 +24,9 @@ export class CreateCustomerService {
 
     const cliente = await prismaClient.client.create({
       data: {
-        nome: nome,
-        telefone: telefone,
-        email: email,
-        cpf: cpf && cpf.trim() !== "" ? cpf : null,
-        cnpj: cnpj && cnpj.trim() !== "" ? cnpj : null,
-        cep: cep,
-        endereco: endereco,
-        numero: numero,
-        bairro: bairro,
-        cidade: cidade,
-        uf: uf,
+        ...data,
+        cpf: normalizedCpf,
+        cnpj: normalizedCnpj,
       },
     });
 

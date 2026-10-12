@@ -15,18 +15,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateOsControllers = void 0;
 const zod_1 = require("zod");
 const http_1 = require("../../helpers/http");
+const common_1 = require("../../schemas/common");
+const order_1 = require("../../schemas/order");
 const updateOsService_1 = require("../../services/os/updateOsService");
 const appError_1 = __importDefault(require("../../utils/appError"));
 class UpdateOsControllers {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const isIdString = req.params.id;
-                const id = Number(isIdString);
-                const params = req.body;
+                const id = yield common_1.idParamSchema.parseAsync(req.params.id);
+                const data = yield order_1.createOrUpdateServiceSchema.parseAsync(req.body);
                 const updateOsService = new updateOsService_1.UpdateOsService();
-                const os = yield updateOsService.execute(Object.assign({ id }, params));
-                res.status(201).json(os);
+                const os = yield updateOsService.execute(Object.assign({ id }, data));
+                return res.status(201).json(os);
             }
             catch (error) {
                 if (error instanceof zod_1.ZodError) {
@@ -35,6 +36,7 @@ class UpdateOsControllers {
                 if (error instanceof appError_1.default) {
                     return res.status(error.statusCode).json({ message: error.message });
                 }
+                console.error(error);
                 return (0, http_1.serverError)(res);
             }
         });

@@ -3,22 +3,25 @@ import { ZodError } from "zod";
 import { badRequest, serverError } from "../../helpers/http";
 import { createOrUpdateServiceSchema } from "../../schemas/order";
 import { CreateOsService } from "../../services/os/createOsService";
+import AppError from "../../utils/appError";
 
 export class CreateOsControllers {
   async handle(req: Request, res: Response) {
     try {
-      const params = req.body;
+      const data = await createOrUpdateServiceSchema.parseAsync(req.body);
 
-      await createOrUpdateServiceSchema.parseAsync(params);
       const createOsService = new CreateOsService();
+      const os = await createOsService.execute(data);
 
-      const os = await createOsService.execute(params);
-
-      res.status(201).json(os);
+      return res.status(201).json(os);
     } catch (error) {
       if (error instanceof ZodError) {
         return badRequest(res, error.issues[0].message);
       }
+      if (error instanceof AppError) {
+        return res.status(error.statusCode).json({ message: error.message });
+      }
+      console.error(error);
       return serverError(res);
     }
   }

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateCustomerController = void 0;
 const zod_1 = require("zod");
 const http_1 = require("../../helpers/http");
+const common_1 = require("../../schemas/common");
 const customer_1 = require("../../schemas/customer");
 const updateCustomerService_1 = require("../../services/customer/updateCustomerService");
 const appError_1 = __importDefault(require("../../utils/appError"));
@@ -22,12 +23,10 @@ class UpdateCustomerController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const isIdString = req.params.id;
-                const id = Number(isIdString);
-                const params = req.body;
-                yield customer_1.updateCustomerSchema.parseAsync(params);
+                const id = yield common_1.idParamSchema.parseAsync(req.params.id);
+                const data = yield customer_1.updateCustomerSchema.parseAsync(req.body);
                 const updateCustomerService = new updateCustomerService_1.UpdateCustomerService();
-                const customer = yield updateCustomerService.execute(Object.assign({ id }, params));
+                const customer = yield updateCustomerService.execute(Object.assign({ id }, data));
                 return res.status(201).json(customer);
             }
             catch (error) {
@@ -37,6 +36,7 @@ class UpdateCustomerController {
                 if (error instanceof appError_1.default) {
                     return res.status(error.statusCode).json({ message: error.message });
                 }
+                console.error(error);
                 return (0, http_1.serverError)(res);
             }
         });

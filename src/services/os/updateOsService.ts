@@ -1,67 +1,39 @@
+import { Prisma } from "@prisma/client";
 import prismaClient from "../../prisma";
+import { OrdemServicoSchema } from "../../schemas/order";
 import AppError from "../../utils/appError";
 
-interface OsProps {
+interface UpdateOsProps extends OrdemServicoSchema {
   id: number;
-  contato: string;
-  horaChegada: string;
-  horaSaida: string;
-  modeloEquipamento: string;
-  defeito: string;
-  defeitoConstatado: string;
-  solucao: string;
-  valServico: number;
-  valMaterial: number;
-  garantiaPeca: string;
-  garantiaServico: string;
-  cliente_id: number;
-  tipoServico: "GARANTIA" | "FORADEGARANTIA" | "ORCAMENTO" | "CONTRATO";
 }
 
 export class UpdateOsService {
-  async execute({
-    id,
-    contato,
-    horaChegada,
-    horaSaida,
-    modeloEquipamento,
-    defeito,
-    defeitoConstatado,
-    solucao,
-    valServico,
-    valMaterial,
-    garantiaPeca,
-    garantiaServico,
-    tipoServico,
-    cliente_id,
-  }: OsProps) {
-    const idExists = await prismaClient.os.findFirst({
-      where: {
-        id,
-      },
+  async execute({ id, cliente_id, ...data }: UpdateOsProps) {
+    const existingOs = await prismaClient.os.findUnique({
+      where: { id },
     });
 
-    if (!idExists) {
-      throw new AppError("Os não encontrada", 404);
+    if (!existingOs) {
+      throw new AppError("Ordem de serviço não encontrada", 404);
     }
 
+    const client = await prismaClient.client.findUnique({
+      where: { id: cliente_id },
+    });
+
+    if (!client) {
+      throw new AppError("Cliente não encontrado", 404);
+    }
+
+    // Um valor ausente no corpo mantém o valor gravado, e o total acompanha
+    const valServico = data.valServico ?? existingOs.valServico ?? 0;
+    const valMaterial = data.valMaterial ?? existingOs.valMaterial ?? 0;
+
     const os = await prismaClient.os.update({
-      where: {
-        id,
-      },
+      where: { id },
       data: {
-        contato,
-        modeloEquipamento,
-        horaChegada,
-        horaSaida,
-        defeito,
-        defeitoConstatado,
-        solucao,
-        valServico,
-        valMaterial,
-        garantiaPeca,
-        garantiaServico,
-        tipoServico,
+        ...data,
+        total: new Prisma.Decimal(valServico).plus(valMaterial),
         client_id: cliente_id,
       },
     });

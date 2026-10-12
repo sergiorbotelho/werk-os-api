@@ -8,12 +8,10 @@ import AppError from "../../utils/appError";
 export class CreateCustomerController {
   async handle(req: Request, res: Response) {
     try {
-      const params = req.body;
+      const data = await createCustomerSchema.parseAsync(req.body);
 
-      await createCustomerSchema.parseAsync(params);
       const createClientService = new CreateCustomerService();
-
-      const client = await createClientService.execute(params);
+      const client = await createClientService.execute(data);
 
       return res.status(201).json(client);
     } catch (error) {
@@ -23,6 +21,7 @@ export class CreateCustomerController {
       if (error instanceof AppError) {
         return res.status(error.statusCode).json({ message: error.message });
       }
+      console.error(error);
       return serverError(res);
     }
   }

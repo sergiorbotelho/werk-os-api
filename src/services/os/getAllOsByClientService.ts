@@ -1,14 +1,14 @@
 import prismaClient from "../../prisma";
 
 export class GetAllOsByClientService {
-  async execute(clientId: string) {
-    const count = await prismaClient.os.count();
+  async execute(clientId: number) {
+    const count = await prismaClient.os.count({
+      where: { client_id: clientId },
+    });
 
     const os = await prismaClient.os.findMany({
       where: {
-        client_id: {
-          equals: parseInt(clientId),
-        },
+        client_id: clientId,
       },
       select: {
         id: true,

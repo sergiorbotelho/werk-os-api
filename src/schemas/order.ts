@@ -18,7 +18,8 @@ const moneySchema = z.coerce
   )
   .optional();
 
-const horaRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+// Segundos opcionais: registros antigos podem ter sido gravados como "HH:mm:ss"
+const horaRegex = /^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/;
 
 export const createOrUpdateServiceSchema = z.object({
   cliente_id: z.coerce.number().int(),

@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -17,29 +28,23 @@ const prisma_1 = __importDefault(require("../../prisma"));
 const appError_1 = __importDefault(require("../../utils/appError"));
 class CreateCustomerService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ nome, telefone, email, cpf, cnpj, cep, endereco, numero, bairro, cidade, uf, }) {
-            const clientExists = yield prisma_1.default.client.findFirst({
-                where: {
-                    OR: [{ cpf: cpf }, { cnpj: cnpj }],
-                },
-            });
+        return __awaiter(this, void 0, void 0, function* () {
+            var { cpf, cnpj } = _a, data = __rest(_a, ["cpf", "cnpj"]);
+            const normalizedCpf = (cpf === null || cpf === void 0 ? void 0 : cpf.trim()) || null;
+            const normalizedCnpj = (cnpj === null || cnpj === void 0 ? void 0 : cnpj.trim()) || null;
+            const documentFilters = [
+                ...(normalizedCpf ? [{ cpf: normalizedCpf }] : []),
+                ...(normalizedCnpj ? [{ cnpj: normalizedCnpj }] : []),
+            ];
+            const clientExists = documentFilters.length > 0 &&
+                (yield prisma_1.default.client.findFirst({
+                    where: { OR: documentFilters },
+                }));
             if (clientExists) {
                 throw new appError_1.default("CPF ou CNPJ Já cadastrado", 400);
             }
             const cliente = yield prisma_1.default.client.create({
-                data: {
-                    nome: nome,
-                    telefone: telefone,
-                    email: email,
-                    cpf: cpf && cpf.trim() !== "" ? cpf : null,
-                    cnpj: cnpj && cnpj.trim() !== "" ? cnpj : null,
-                    cep: cep,
-                    endereco: endereco,
-                    numero: numero,
-                    bairro: bairro,
-                    cidade: cidade,
-                    uf: uf,
-                },
+                data: Object.assign(Object.assign({}, data), { cpf: normalizedCpf, cnpj: normalizedCnpj }),
             });
             return cliente;
         });

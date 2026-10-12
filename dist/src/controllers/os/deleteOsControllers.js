@@ -13,22 +13,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteOsController = void 0;
+const zod_1 = require("zod");
 const http_1 = require("../../helpers/http");
+const common_1 = require("../../schemas/common");
 const deleteOsService_1 = require("../../services/os/deleteOsService");
 const appError_1 = __importDefault(require("../../utils/appError"));
 class DeleteOsController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const id = Number(req.params.id);
+                const id = yield common_1.idParamSchema.parseAsync(req.params.id);
                 const service = new deleteOsService_1.DeleteOsService();
                 const result = yield service.execute({ id });
                 return res.status(200).json(result);
             }
             catch (error) {
+                if (error instanceof zod_1.ZodError) {
+                    return (0, http_1.badRequest)(res, error.issues[0].message);
+                }
                 if (error instanceof appError_1.default) {
                     return res.status(error.statusCode).json({ message: error.message });
                 }
+                console.error(error);
                 return (0, http_1.serverError)(res);
             }
         });

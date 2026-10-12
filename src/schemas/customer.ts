@@ -66,6 +66,8 @@ export const createCustomerSchema = customerBaseSchema.superRefine(
   },
 );
 
+export type CreateCustomerInput = z.infer<typeof createCustomerSchema>;
+
 export const updateCustomerSchema = customerBaseSchema.superRefine(
   (data, ctx) => {
     const cpf = data.cpf?.trim() || "";
@@ -88,3 +90,5 @@ export const updateCustomerSchema = customerBaseSchema.superRefine(
     }
   },
 );
+
+export type UpdateCustomerInput = z.infer<typeof updateCustomerSchema>;

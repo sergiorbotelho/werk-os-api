@@ -22,10 +22,9 @@ class CreateCustomerController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const params = req.body;
-                yield customer_1.createCustomerSchema.parseAsync(params);
+                const data = yield customer_1.createCustomerSchema.parseAsync(req.body);
                 const createClientService = new createCustomerService_1.CreateCustomerService();
-                const client = yield createClientService.execute(params);
+                const client = yield createClientService.execute(data);
                 return res.status(201).json(client);
             }
             catch (error) {
@@ -35,6 +34,7 @@ class CreateCustomerController {
                 if (error instanceof appError_1.default) {
                     return res.status(error.statusCode).json({ message: error.message });
                 }
+                console.error(error);
                 return (0, http_1.serverError)(res);
             }
         });

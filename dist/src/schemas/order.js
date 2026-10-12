@@ -16,7 +16,8 @@ const moneySchema = zod_1.z.coerce
     .nonnegative("Valor não pode ser negativo")
     .refine((value) => /^\d+(\.\d{1,2})?$/.test(value.toString()), "Máximo de 2 casas decimais")
     .optional();
-const horaRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+// Segundos opcionais: registros antigos podem ter sido gravados como "HH:mm:ss"
+const horaRegex = /^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/;
 exports.createOrUpdateServiceSchema = zod_1.z.object({
     cliente_id: zod_1.z.coerce.number().int(),
     tipoServico: zod_1.z.enum(TipoServico, {

@@ -14,16 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetOsByIdService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
+const appError_1 = __importDefault(require("../../utils/appError"));
 class GetOsByIdService {
     execute(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const os = prisma_1.default.os.findFirst({
-                where: {
-                    id: {
-                        equals: parseInt(id),
-                    },
-                },
+            const os = yield prisma_1.default.os.findUnique({
+                where: { id },
                 select: {
+                    id: true,
                     contato: true,
                     modeloEquipamento: true,
                     defeito: true,
@@ -36,9 +34,13 @@ class GetOsByIdService {
                     total: true,
                     garantiaPeca: true,
                     garantiaServico: true,
+                    tipoServico: true,
                     client_id: true,
                 },
             });
+            if (!os) {
+                throw new appError_1.default("Ordem de serviço não encontrada", 404);
+            }
             return os;
         });
     }

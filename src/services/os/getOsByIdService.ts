@@ -1,14 +1,12 @@
 import prismaClient from "../../prisma";
+import AppError from "../../utils/appError";
 
 export class GetOsByIdService {
-  async execute(id: string) {
-    const os = prismaClient.os.findFirst({
-      where: {
-        id: {
-          equals: parseInt(id),
-        },
-      },
+  async execute(id: number) {
+    const os = await prismaClient.os.findUnique({
+      where: { id },
       select: {
+        id: true,
         contato: true,
         modeloEquipamento: true,
         defeito: true,
@@ -21,9 +19,15 @@ export class GetOsByIdService {
         total: true,
         garantiaPeca: true,
         garantiaServico: true,
+        tipoServico: true,
         client_id: true,
       },
     });
+
+    if (!os) {
+      throw new AppError("Ordem de serviço não encontrada", 404);
+    }
+
     return os;
   }
 }
