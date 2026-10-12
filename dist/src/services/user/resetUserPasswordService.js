@@ -19,7 +19,10 @@ const appError_1 = __importDefault(require("../../utils/appError"));
 const generateTemporaryPassword_1 = require("../../utils/generateTemporaryPassword");
 class ResetUserPasswordService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ id }) {
+        return __awaiter(this, arguments, void 0, function* ({ id, actorId }) {
+            if (id === actorId) {
+                throw new appError_1.default("Use a página Meu perfil para trocar sua senha", 400);
+            }
             const user = yield prisma_1.default.user.findUnique({
                 where: { id },
                 select: { id: true },

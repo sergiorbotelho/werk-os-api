@@ -169,7 +169,7 @@ Content-Type: application/json
 | GET    | `/users`                     | admin  | Lista os usuários: `{ users, count }` |
 | POST   | `/users`                     | admin  | Cadastra (`name`, `email`, `role`) e devolve `{ user, temporaryPassword }` |
 | PUT    | `/users/:id`                 | admin  | Altera `name`, `role` e `active` |
-| POST   | `/users/:id/reset-password`  | admin  | Gera nova senha temporária: `{ temporaryPassword }` |
+| POST   | `/users/:id/reset-password`  | admin  | Gera nova senha temporária: `{ temporaryPassword }`. Retorna 400 se o admin usar o próprio id (ele troca a senha em `PUT /me/password`) |
 
 ### Clientes
 

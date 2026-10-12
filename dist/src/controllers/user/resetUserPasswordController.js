@@ -17,7 +17,10 @@ class ResetUserPasswordController {
         return __awaiter(this, void 0, void 0, function* () {
             const id = yield common_1.uuidParamSchema.parseAsync(req.params.id);
             const resetUserPasswordService = new resetUserPasswordService_1.ResetUserPasswordService();
-            const result = yield resetUserPasswordService.execute({ id });
+            const result = yield resetUserPasswordService.execute({
+                id,
+                actorId: req.user_id,
+            });
             return res.status(200).json(result);
         });
     }

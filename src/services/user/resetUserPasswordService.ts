@@ -5,10 +5,15 @@ import { generateTemporaryPassword } from "../../utils/generateTemporaryPassword
 
 interface ResetUserPasswordRequest {
   id: string;
+  actorId: string;
 }
 
 export class ResetUserPasswordService {
-  async execute({ id }: ResetUserPasswordRequest) {
+  async execute({ id, actorId }: ResetUserPasswordRequest) {
+    if (id === actorId) {
+      throw new AppError("Use a página Meu perfil para trocar sua senha", 400);
+    }
+
     const user = await prismaClient.user.findUnique({
       where: { id },
       select: { id: true },

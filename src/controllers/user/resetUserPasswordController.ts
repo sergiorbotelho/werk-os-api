@@ -7,7 +7,10 @@ export class ResetUserPasswordController {
     const id = await uuidParamSchema.parseAsync(req.params.id);
 
     const resetUserPasswordService = new ResetUserPasswordService();
-    const result = await resetUserPasswordService.execute({ id });
+    const result = await resetUserPasswordService.execute({
+      id,
+      actorId: req.user_id,
+    });
 
     return res.status(200).json(result);
   }
