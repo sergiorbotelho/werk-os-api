@@ -1,7 +1,7 @@
 # PDF da OS gerado no backend
 
 Data: 2026-10-12
-Status: aprovado em conversa, aguardando revisão da spec
+Status: aprovada
 
 ## Objetivo
 
@@ -24,7 +24,7 @@ Motivo: centralizar a geração em um único lugar, sempre com os dados atuais d
 
 ### Fora do escopo
 
-- Guardar cópias do PDF ou versões da OS como emitida.
+- Guardar cópias do PDF ou versões da OS como emitida. Se a geração a cada pedido ficar lenta no futuro, o caminho é um cache só no backend: tabela `os_pdf` (`os_id` único, FK com `ON DELETE CASCADE`, `conteudo` bytea, `gerado_em`), regerada ao criar e editar a OS e ao editar o cliente. O endpoint e o front não mudam.
 - Link público para o cliente abrir o PDF sem login.
 - Mudanças no layout do documento.
 
