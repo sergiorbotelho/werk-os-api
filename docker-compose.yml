@@ -1,6 +1,7 @@
 services:
   postgres:
-    image: postgres
+    # Versão fixa: um upgrade de major da imagem não abre o volume da versão anterior
+    image: postgres:18
     container_name: api-werk-postgres
     environment:
       POSTGRES_PASSWORD: 123456
@@ -9,4 +10,9 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ./.postgres-data:/var/lib/postgresql
+      # Volume do Docker, não uma pasta do Windows: no WSL2, uma pasta em /mnt/<disco>
+      # não garante a gravação que o Postgres exige e os dados podem corromper
+      - postgres-data:/var/lib/postgresql
+
+volumes:
+  postgres-data:
