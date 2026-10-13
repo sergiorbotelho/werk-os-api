@@ -7,6 +7,7 @@ export const profileSelect = {
   email: true,
   role: true,
   mustChangePassword: true,
+  avatarUpdatedAt: true,
 } satisfies Prisma.UserSelect;
 
 // Campos devolvidos na gestão de usuários (admin)

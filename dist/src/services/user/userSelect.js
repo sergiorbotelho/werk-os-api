@@ -8,6 +8,7 @@ exports.profileSelect = {
     email: true,
     role: true,
     mustChangePassword: true,
+    avatarUpdatedAt: true,
 };
 // Campos devolvidos na gestão de usuários (admin)
 exports.userSelect = Object.assign(Object.assign({}, exports.profileSelect), { active: true, created_at: true });
