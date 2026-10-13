@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.errorHandler = errorHandler;
 const client_1 = require("@prisma/client");
 const zod_1 = require("zod");
+const backupFile_1 = require("../lib/backupFile");
 const appError_1 = __importDefault(require("../utils/appError"));
 // Erros do Prisma que representam falha do cliente, não do servidor
 const prismaErrors = {
@@ -29,10 +30,14 @@ function errorHandler(err, req, res, next) {
     if (err.type === "entity.parse.failed") {
         return res.status(400).json({ message: "JSON inválido" });
     }
-    // Corpo acima do limite (lançado pelo body-parser). Só a rota de foto chega
-    // perto do limite na prática.
+    // Corpo acima do limite (lançado pelo body-parser, que preenche err.limit em
+    // bytes). Só o restore de backup tem limite de 4 MB; o resto chega perto do
+    // limite apenas na rota de foto.
     if (err.type === "entity.too.large") {
-        return res.status(413).json({ message: "Imagem muito grande (máx. 1 MB)" });
+        const message = err.limit === backupFile_1.BACKUP_MAX_BYTES
+            ? "Arquivo muito grande (máx. 4 MB)"
+            : "Imagem muito grande (máx. 1 MB)";
+        return res.status(413).json({ message });
     }
     console.error(err);
     return res.status(500).json({ message: "Erro interno do servidor" });

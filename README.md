@@ -20,6 +20,7 @@ API REST para gestão de **Ordens de Serviço (OS)**, clientes e usuários de as
 - [Endpoints](#endpoints)
 - [Modelo de dados](#modelo-de-dados)
 - [Arquitetura](#arquitetura)
+- [Backup e restauração](#backup-e-restauração)
 - [Deploy](#deploy)
 - [Roadmap](#roadmap)
 - [Autor](#autor)
@@ -63,6 +64,12 @@ API REST para gestão de **Ordens de Serviço (OS)**, clientes e usuários de as
 - Controle de valores de serviço e material, com cálculo automático do total
 - Controle de garantia de peça e de serviço
 - Classificação por tipo de atendimento: `GARANTIA`, `FORADEGARANTIA`, `ORCAMENTO` e `CONTRATO`
+
+**Backup (somente admin)**
+
+- Geração e download de um backup completo do banco (`.json.gz`): usuários, fotos, clientes e OS
+- Restauração a partir do arquivo, com validação completa antes de apagar qualquer dado e transação única
+- Registro de quem fez cada backup e restauração, com lembrete na tela quando o último backup tem mais de 7 dias
 
 ## Pré-requisitos
 
@@ -197,6 +204,14 @@ Content-Type: application/json
 | PUT    | `/os/:id`               | Atualiza uma OS                  |
 | DELETE | `/os/:id`               | Exclui uma OS (somente admin)    |
 
+### Backup
+
+| Método | Rota              | Acesso | Descrição |
+| ------ | ----------------- | ------ | --------- |
+| GET    | `/backup/status`  | admin  | Último backup e última restauração: `{ lastBackup, lastRestore }`, cada um `{ userName, created_at, counts }` ou `null` |
+| POST   | `/backup`         | admin  | Gera e baixa o backup (`application/gzip`, `werk-backup-AAAA-MM-DD-HHmm.json.gz`). 413 se passar de 4 MB |
+| POST   | `/backup/restore` | admin  | Substitui **todos** os dados pelos do arquivo. Corpo cru com `Content-Type: application/gzip`, até 4 MB. Devolve `{ message, counts }` |
+
 ### Erros
 
 Todos os erros retornam o mesmo formato:
@@ -207,12 +222,12 @@ Todos os erros retornam o mesmo formato:
 
 | Status | Quando ocorre |
 | ------ | ------------- |
-| 400    | Corpo ou id inválido, JSON malformado, imagem em formato inválido ou regra de negócio violada |
+| 400    | Corpo ou id inválido, JSON malformado, imagem em formato inválido, arquivo de backup inválido ou regra de negócio violada |
 | 401    | Token ausente, inválido ou expirado, ou credenciais incorretas |
 | 403    | Ação exclusiva de admin, troca de senha pendente ou login de usuário desativado |
 | 404    | Registro não encontrado |
 | 409    | CPF/CNPJ ou e-mail já cadastrado |
-| 413    | Foto acima de 1 MB |
+| 413    | Foto acima de 1 MB, ou arquivo de backup acima de 4 MB |
 | 500    | Erro inesperado no servidor |
 
 ## Modelo de dados
@@ -277,6 +292,26 @@ Fluxo de uma requisição:
 rota → isAuthenticated → requireAdmin (rotas de admin) → controller → service → Prisma → PostgreSQL
 ```
 
+## Backup e restauração
+
+O admin gera o backup na tela **Backup** do sistema (ou em `POST /backup`). O arquivo `.json.gz` contém todos os usuários (com as senhas criptografadas), as fotos, os clientes e as OS. Guarde-o em local seguro.
+
+A restauração (`POST /backup/restore`) **substitui todos os dados** pelos do arquivo, inclusive usuários e senhas. Ela funciona também num banco novo e vazio: aponte a API para o novo Postgres, deixe o deploy rodar as migrations e o seed, entre com o admin do seed e restaure o arquivo. O formato tem versão (`version: 1`). A API recusa arquivos de outra versão, corrompidos ou inconsistentes antes de apagar qualquer coisa.
+
+O arquivo é limitado a 4 MB, porque a Vercel limita o corpo das requisições e respostas a 4,5 MB.
+
+### Procedimento manual (`pg_dump`)
+
+Para quando o backup passar de 4 MB, a API estiver fora do ar ou for preciso um dump nativo do Postgres. Usa o `pg_dump` do container do `docker-compose`, sem instalar nada. Use a connection string **direta** do Neon (sem `-pooler` no host):
+
+```bash
+# Backup
+docker exec api-werk-postgres pg_dump --format=custom --no-owner --no-privileges "<url-direta>" > werk.dump
+
+# Restauração num banco vazio
+docker exec -i api-werk-postgres pg_restore --no-owner --no-privileges --dbname "<url-direta>" < werk.dump
+```
+
 ## Deploy
 
 O projeto é publicado na Vercel a partir do código já compilado em `dist/`. Durante o deploy, o script `vercel-build` executa `prisma generate`, `prisma migrate deploy` e `prisma db seed`.
@@ -293,7 +328,7 @@ Por isso, ao alterar qualquer arquivo em `src/` ou `prisma/seed.ts`, execute `np
 - [ ] Dashboard com indicadores
 - [ ] Relatórios em PDF
 - [ ] Testes automatizados
-- [ ] Backup e restauração do banco (somente admin)
+- [x] Backup e restauração do banco (somente admin)
 
 ## Licença
 

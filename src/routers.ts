@@ -2,6 +2,7 @@ import { raw, Router } from "express";
 import { UpdateProfileController } from "./controllers/user/updateProfileController";
 import { CreateBackupController } from "./controllers/backup/createBackupController";
 import { GetBackupStatusController } from "./controllers/backup/getBackupStatusController";
+import { RestoreBackupController } from "./controllers/backup/restoreBackupController";
 import { CreateCustomerController } from "./controllers/customer/createCustomerControllers";
 import { DeleteCustomerController } from "./controllers/customer/deleteCustomerControllers";
 import { GetClientByIdControllers } from "./controllers/customer/getCustomerByIdControllers";
@@ -28,7 +29,9 @@ import {
   isAuthenticated,
   isAuthenticatedPendingPassword,
 } from "./middlewares/isAuthenticated";
+import { BACKUP_MAX_BYTES } from "./lib/backupFile";
 import { requireAdmin } from "./middlewares/requireAdmin";
+import { backupMimeTypes } from "./schemas/backup";
 import { avatarMimeTypes } from "./schemas/user";
 
 const router = Router();
@@ -73,6 +76,14 @@ router.post(
   isAuthenticated,
   requireAdmin,
   new CreateBackupController().handle,
+);
+// Corpo cru só nesta rota, e só depois de confirmar que é admin
+router.post(
+  "/backup/restore",
+  isAuthenticated,
+  requireAdmin,
+  raw({ type: [...backupMimeTypes], limit: BACKUP_MAX_BYTES }),
+  new RestoreBackupController().handle,
 );
 
 router.post("/session", new authUserControllers().handle);

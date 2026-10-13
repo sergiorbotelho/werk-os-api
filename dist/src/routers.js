@@ -5,6 +5,7 @@ const express_1 = require("express");
 const updateProfileController_1 = require("./controllers/user/updateProfileController");
 const createBackupController_1 = require("./controllers/backup/createBackupController");
 const getBackupStatusController_1 = require("./controllers/backup/getBackupStatusController");
+const restoreBackupController_1 = require("./controllers/backup/restoreBackupController");
 const createCustomerControllers_1 = require("./controllers/customer/createCustomerControllers");
 const deleteCustomerControllers_1 = require("./controllers/customer/deleteCustomerControllers");
 const getCustomerByIdControllers_1 = require("./controllers/customer/getCustomerByIdControllers");
@@ -28,7 +29,9 @@ const resetUserPasswordController_1 = require("./controllers/user/resetUserPassw
 const updateUserController_1 = require("./controllers/user/updateUserController");
 const uploadAvatarController_1 = require("./controllers/user/uploadAvatarController");
 const isAuthenticated_1 = require("./middlewares/isAuthenticated");
+const backupFile_1 = require("./lib/backupFile");
 const requireAdmin_1 = require("./middlewares/requireAdmin");
+const backup_1 = require("./schemas/backup");
 const user_1 = require("./schemas/user");
 const router = (0, express_1.Router)();
 exports.router = router;
@@ -39,6 +42,8 @@ router.post("/users/:id/reset-password", isAuthenticated_1.isAuthenticated, requ
 router.get("/users/:id/avatar", isAuthenticated_1.isAuthenticated, new getAvatarController_1.GetAvatarController().handle);
 router.get("/backup/status", isAuthenticated_1.isAuthenticated, requireAdmin_1.requireAdmin, new getBackupStatusController_1.GetBackupStatusController().handle);
 router.post("/backup", isAuthenticated_1.isAuthenticated, requireAdmin_1.requireAdmin, new createBackupController_1.CreateBackupController().handle);
+// Corpo cru só nesta rota, e só depois de confirmar que é admin
+router.post("/backup/restore", isAuthenticated_1.isAuthenticated, requireAdmin_1.requireAdmin, (0, express_1.raw)({ type: [...backup_1.backupMimeTypes], limit: backupFile_1.BACKUP_MAX_BYTES }), new restoreBackupController_1.RestoreBackupController().handle);
 router.post("/session", new authUserControllers_1.authUserControllers().handle);
 router.get("/me", isAuthenticated_1.isAuthenticatedPendingPassword, new detailUserControllers_1.detailUserController().handle);
 router.put("/me", isAuthenticated_1.isAuthenticated, new updateProfileController_1.UpdateProfileController().handle);
