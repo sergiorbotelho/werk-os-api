@@ -12,7 +12,10 @@ export class GetAvatarController {
     // O front pede a foto com ?v=<avatarUpdatedAt>: foto nova, URL nova
     res.setHeader("Content-Type", avatar.mimeType);
     res.setHeader("Cache-Control", "private, max-age=31536000, immutable");
+    // Bytes enviados pelo usuário: o navegador não pode tratá-los como outro tipo
+    res.setHeader("X-Content-Type-Options", "nosniff");
 
-    return res.status(200).send(avatar.data);
+    // Buffer.from: send() serializaria um Uint8Array como JSON
+    return res.status(200).send(Buffer.from(avatar.data));
   }
 }

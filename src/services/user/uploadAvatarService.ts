@@ -14,6 +14,8 @@ export class UploadAvatarService {
         where: { userId },
         create: { userId, mimeType, data },
         update: { mimeType, data },
+        // Sem select, a foto (até 1 MB) voltaria do banco à toa
+        select: { userId: true },
       }),
       prismaClient.user.update({
         where: { id: userId },

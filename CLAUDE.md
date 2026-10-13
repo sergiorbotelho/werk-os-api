@@ -88,7 +88,7 @@ The front end (`werk-app`, Next.js) depends on these shapes, which are inconsist
 | `GET /users` | `{ users: [...], count }`, each without `password` |
 | `PUT /users/:id` | the updated user |
 | `POST /users/:id/reset-password` | `{ temporaryPassword }` |
-| `GET /users/:id/avatar` | the photo bytes with the stored `Content-Type` and `Cache-Control: private, max-age=31536000, immutable`; 404 if the user has no photo |
+| `GET /users/:id/avatar` | the photo bytes with the stored `Content-Type`, `Cache-Control: private, max-age=31536000, immutable` and `X-Content-Type-Options: nosniff`; 404 if the user has no photo |
 | `DELETE` routes | `{ message }` |
 
 ### Auth
