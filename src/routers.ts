@@ -1,5 +1,7 @@
 import { raw, Router } from "express";
 import { UpdateProfileController } from "./controllers/user/updateProfileController";
+import { CreateBackupController } from "./controllers/backup/createBackupController";
+import { GetBackupStatusController } from "./controllers/backup/getBackupStatusController";
 import { CreateCustomerController } from "./controllers/customer/createCustomerControllers";
 import { DeleteCustomerController } from "./controllers/customer/deleteCustomerControllers";
 import { GetClientByIdControllers } from "./controllers/customer/getCustomerByIdControllers";
@@ -59,6 +61,18 @@ router.get(
   "/users/:id/avatar",
   isAuthenticated,
   new GetAvatarController().handle,
+);
+router.get(
+  "/backup/status",
+  isAuthenticated,
+  requireAdmin,
+  new GetBackupStatusController().handle,
+);
+router.post(
+  "/backup",
+  isAuthenticated,
+  requireAdmin,
+  new CreateBackupController().handle,
 );
 
 router.post("/session", new authUserControllers().handle);

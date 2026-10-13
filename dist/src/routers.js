@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.router = void 0;
 const express_1 = require("express");
 const updateProfileController_1 = require("./controllers/user/updateProfileController");
+const createBackupController_1 = require("./controllers/backup/createBackupController");
+const getBackupStatusController_1 = require("./controllers/backup/getBackupStatusController");
 const createCustomerControllers_1 = require("./controllers/customer/createCustomerControllers");
 const deleteCustomerControllers_1 = require("./controllers/customer/deleteCustomerControllers");
 const getCustomerByIdControllers_1 = require("./controllers/customer/getCustomerByIdControllers");
@@ -35,6 +37,8 @@ router.post("/users", isAuthenticated_1.isAuthenticated, requireAdmin_1.requireA
 router.put("/users/:id", isAuthenticated_1.isAuthenticated, requireAdmin_1.requireAdmin, new updateUserController_1.UpdateUserController().handle);
 router.post("/users/:id/reset-password", isAuthenticated_1.isAuthenticated, requireAdmin_1.requireAdmin, new resetUserPasswordController_1.ResetUserPasswordController().handle);
 router.get("/users/:id/avatar", isAuthenticated_1.isAuthenticated, new getAvatarController_1.GetAvatarController().handle);
+router.get("/backup/status", isAuthenticated_1.isAuthenticated, requireAdmin_1.requireAdmin, new getBackupStatusController_1.GetBackupStatusController().handle);
+router.post("/backup", isAuthenticated_1.isAuthenticated, requireAdmin_1.requireAdmin, new createBackupController_1.CreateBackupController().handle);
 router.post("/session", new authUserControllers_1.authUserControllers().handle);
 router.get("/me", isAuthenticated_1.isAuthenticatedPendingPassword, new detailUserControllers_1.detailUserController().handle);
 router.put("/me", isAuthenticated_1.isAuthenticated, new updateProfileController_1.UpdateProfileController().handle);
