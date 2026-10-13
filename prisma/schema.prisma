@@ -93,3 +93,21 @@ model Os{
   @@map("os")
   client_id Int
 }
+
+enum BackupAction {
+  BACKUP
+  RESTORE
+}
+
+// Fora do backup e não apagada pelo restore: o histórico sobrevive às restaurações.
+// Sem FK para users, porque o restore troca os usuários.
+model BackupLog {
+  id Int @id @default(autoincrement())
+  action BackupAction
+  userName String @db.VarChar(255)
+  userEmail String @db.VarChar(255)
+  counts Json
+  created_at DateTime @default(now())
+
+  @@map("backup_logs")
+}
