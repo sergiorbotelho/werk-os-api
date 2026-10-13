@@ -45,6 +45,7 @@ API REST para gestão de **Ordens de Serviço (OS)**, clientes e usuários de as
 - Cadastro de usuários pelo admin, com senha temporária gerada pelo sistema e troca obrigatória no primeiro acesso
 - Edição de nome e perfil, desativação e redefinição de senha pelo admin
 - Perfil do usuário: alteração do próprio nome e da própria senha (mínimo de 8 caracteres, com letra e número)
+- Foto de perfil: cada usuário envia, troca e remove a própria foto (JPEG, PNG ou WebP de até 1 MB); sem foto, o front mostra as iniciais
 - Login com emissão de token JWT (validade de 30 dias)
 
 **Clientes**
@@ -166,10 +167,13 @@ Content-Type: application/json
 | GET    | `/me`                        | logado | Dados do usuário logado (`role`, `mustChangePassword`) |
 | PUT    | `/me`                        | logado | Altera o próprio nome |
 | PUT    | `/me/password`               | logado | Troca a própria senha (`currentPassword`, `newPassword`) |
+| PUT    | `/me/avatar`                 | logado | Envia ou troca a própria foto. Corpo cru com `Content-Type` `image/jpeg`, `image/png` ou `image/webp`, até 1 MB. Devolve o perfil com `avatarUpdatedAt` |
+| DELETE | `/me/avatar`                 | logado | Remove a própria foto |
 | GET    | `/users`                     | admin  | Lista os usuários: `{ users, count }` |
 | POST   | `/users`                     | admin  | Cadastra (`name`, `email`, `role`) e devolve `{ user, temporaryPassword }` |
 | PUT    | `/users/:id`                 | admin  | Altera `name`, `role` e `active` |
 | POST   | `/users/:id/reset-password`  | admin  | Gera nova senha temporária: `{ temporaryPassword }`. Retorna 400 se o admin usar o próprio id (ele troca a senha em `PUT /me/password`) |
+| GET    | `/users/:id/avatar`          | logado | Foto do usuário (binário, com cache longo; o cliente versiona a URL com `?v=<avatarUpdatedAt>`). 404 se ele não tiver foto |
 
 ### Clientes
 
@@ -203,11 +207,12 @@ Todos os erros retornam o mesmo formato:
 
 | Status | Quando ocorre |
 | ------ | ------------- |
-| 400    | Corpo ou id inválido, JSON malformado ou regra de negócio violada |
+| 400    | Corpo ou id inválido, JSON malformado, imagem em formato inválido ou regra de negócio violada |
 | 401    | Token ausente, inválido ou expirado, ou credenciais incorretas |
 | 403    | Ação exclusiva de admin, troca de senha pendente ou login de usuário desativado |
 | 404    | Registro não encontrado |
 | 409    | CPF/CNPJ ou e-mail já cadastrado |
+| 413    | Foto acima de 1 MB |
 | 500    | Erro inesperado no servidor |
 
 ## Modelo de dados

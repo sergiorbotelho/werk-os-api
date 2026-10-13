@@ -44,6 +44,7 @@ Controllers have no try/catch. They validate the route id with `idParamSchema` (
 - `AppError` (`src/utils/appError.ts`) → its `statusCode`
 - Prisma `P2002` → 409, `P2003` → 400, `P2025` → 404
 - malformed JSON body → 400
+- body over the parser limit (`entity.too.large`) → 413 "Imagem muito grande (máx. 1 MB)"
 - anything else → 500, logged
 
 Every error response is `{ message }`. The front end reads only `error.response.data.message` and status 401.
@@ -61,6 +62,7 @@ Business rules in services:
 - Creating or updating an OS requires an existing client (404).
 - `Os.total` is `valServico + valMaterial`, computed with `Prisma.Decimal` on create and on update. On update, a money field missing from the body keeps its stored value.
 - No list endpoint is paginated. Pagination code is commented out in the services.
+- Any user can upload (`PUT /me/avatar`) or remove (`DELETE /me/avatar`) only their own profile photo. The upload is a raw body parsed by `raw()` on that route alone (JPEG, PNG or WebP, 1 MB); `avatarSchema` checks the file signature, not just the `Content-Type`. The bytes go to `UserAvatar` and `User.avatarUpdatedAt` is set in the same transaction.
 
 The OS PDF is built by `src/reports/osPdf.ts` (`buildOsPdfDefinition`, a pure function ported from the front end's `pdfOrder.tsx`) and rendered by `src/lib/pdf.ts` (`renderPdf`, pdfmake 0.2.13 server API with the Roboto fonts from `pdfmake/build/vfs_fonts`). The logo is embedded as base64 in `src/reports/logo.ts`, because `tsc` does not copy images into `dist/`. Dates use the `America/Recife` time zone, since Vercel runs in UTC.
 
@@ -81,11 +83,12 @@ The front end (`werk-app`, Next.js) depends on these shapes, which are inconsist
 | `POST /users` | `{ user, temporaryPassword }` (201) |
 | `POST /session` | `{ id, name, email, role, mustChangePassword, token }` |
 | `PUT /customer/:id`, `PUT /os/:id` | the updated record (200) |
-| `GET /me`, `PUT /me` | `{ id, name, email, role, mustChangePassword }` |
+| `GET /me`, `PUT /me`, `PUT /me/avatar` | `{ id, name, email, role, mustChangePassword, avatarUpdatedAt }` |
 | `PUT /me/password` | `{ message }` |
 | `GET /users` | `{ users: [...], count }`, each without `password` |
 | `PUT /users/:id` | the updated user |
 | `POST /users/:id/reset-password` | `{ temporaryPassword }` |
+| `GET /users/:id/avatar` | the photo bytes with the stored `Content-Type` and `Cache-Control: private, max-age=31536000, immutable`; 404 if the user has no photo |
 | `DELETE` routes | `{ message }` |
 
 ### Auth
@@ -102,6 +105,7 @@ The schema is in `prisma/schema.prisma`.
 
 - `User` uses UUID ids. `Client` and `Os` use autoincrement ints.
 - `User.role` (`ADMIN` | `BASICO`, default `BASICO`), `User.active` (default `true`) and `User.mustChangePassword` (default `false`).
+- `User.avatarUpdatedAt` is `null` when the user has no photo, and it is the cache version the front puts in the photo URL. The bytes live in `UserAvatar` (`user_avatars`, 1:1 by `userId`, cascade delete), kept out of `users` because `isAuthenticated` reads the user on every request.
 - `Client.cpf` and `Client.cnpj` are optional but unique, and at least one of them is required. CPF/CNPJ are validated with `cpf-cnpj-validator` in `src/schemas/customer.ts`, using `createCustomerSchema` and `updateCustomerSchema`. Only the create schema enforces "at least one"; the update service enforces it too.
 - OS request bodies use `cliente_id`, and services map it to the Prisma column `client_id`.
 - `TipoServico` is a Prisma enum. `src/schemas/order.ts` imports it from `@prisma/client`.

@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { raw, Router } from "express";
 import { UpdateProfileController } from "./controllers/user/updateProfileController";
 import { CreateCustomerController } from "./controllers/customer/createCustomerControllers";
 import { DeleteCustomerController } from "./controllers/customer/deleteCustomerControllers";
@@ -15,15 +15,19 @@ import { UpdateOsControllers } from "./controllers/os/updateOsControlles";
 import { authUserControllers } from "./controllers/user/authUserControllers";
 import { ChangePasswordController } from "./controllers/user/changePasswordController";
 import { CreateUserController } from "./controllers/user/createUserControllers";
+import { DeleteAvatarController } from "./controllers/user/deleteAvatarController";
 import { detailUserController } from "./controllers/user/detailUserControllers";
+import { GetAvatarController } from "./controllers/user/getAvatarController";
 import { ListUsersController } from "./controllers/user/listUsersController";
 import { ResetUserPasswordController } from "./controllers/user/resetUserPasswordController";
 import { UpdateUserController } from "./controllers/user/updateUserController";
+import { UploadAvatarController } from "./controllers/user/uploadAvatarController";
 import {
   isAuthenticated,
   isAuthenticatedPendingPassword,
 } from "./middlewares/isAuthenticated";
 import { requireAdmin } from "./middlewares/requireAdmin";
+import { avatarMimeTypes } from "./schemas/user";
 
 const router = Router();
 
@@ -51,6 +55,11 @@ router.post(
   requireAdmin,
   new ResetUserPasswordController().handle,
 );
+router.get(
+  "/users/:id/avatar",
+  isAuthenticated,
+  new GetAvatarController().handle,
+);
 
 router.post("/session", new authUserControllers().handle);
 
@@ -65,6 +74,14 @@ router.put(
   isAuthenticatedPendingPassword,
   new ChangePasswordController().handle,
 );
+// Corpo cru só nesta rota; o express.json global continua com 100 KB
+router.put(
+  "/me/avatar",
+  isAuthenticated,
+  raw({ type: [...avatarMimeTypes], limit: "1mb" }),
+  new UploadAvatarController().handle,
+);
+router.delete("/me/avatar", isAuthenticated, new DeleteAvatarController().handle);
 
 router.post(
   "/customer",

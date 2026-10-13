@@ -29,6 +29,11 @@ function errorHandler(err, req, res, next) {
     if (err.type === "entity.parse.failed") {
         return res.status(400).json({ message: "JSON inválido" });
     }
+    // Corpo acima do limite (lançado pelo body-parser). Só a rota de foto chega
+    // perto do limite na prática.
+    if (err.type === "entity.too.large") {
+        return res.status(413).json({ message: "Imagem muito grande (máx. 1 MB)" });
+    }
     console.error(err);
     return res.status(500).json({ message: "Erro interno do servidor" });
 }

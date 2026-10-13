@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateProfileSchema = exports.changePasswordSchema = exports.authUserSchema = exports.updateUserSchema = exports.createUserSchema = exports.passwordSchema = exports.nameSchema = exports.emailSchema = void 0;
+exports.avatarSchema = exports.avatarMimeTypes = exports.updateProfileSchema = exports.changePasswordSchema = exports.authUserSchema = exports.updateUserSchema = exports.createUserSchema = exports.passwordSchema = exports.nameSchema = exports.emailSchema = void 0;
 const client_1 = require("@prisma/client");
 const zod_1 = require("zod");
 // trim e toLowerCase antes do formato: " Maria@Werk.com " vira "maria@werk.com"
@@ -52,4 +52,41 @@ exports.changePasswordSchema = zod_1.z.object({
 });
 exports.updateProfileSchema = zod_1.z.object({
     name: exports.nameSchema,
+});
+exports.avatarMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+const invalidImageMessage = "Formato de imagem inválido (use JPEG, PNG ou WebP)";
+// Os bytes iniciais precisam bater com o tipo declarado: impede servir HTML ou
+// SVG disfarçado de imagem.
+function matchesSignature(mimeType, data) {
+    // Defensivo: se os campos já falharam, não deixa o refine lançar TypeError (500)
+    if (!Buffer.isBuffer(data))
+        return false;
+    switch (mimeType) {
+        case "image/jpeg":
+            return data.subarray(0, 3).equals(Buffer.from([0xff, 0xd8, 0xff]));
+        case "image/png":
+            return data
+                .subarray(0, 8)
+                .equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+        case "image/webp":
+            return (data.subarray(0, 4).toString("ascii") === "RIFF" &&
+                data.subarray(8, 12).toString("ascii") === "WEBP");
+        default:
+            return false;
+    }
+}
+// Recebe { mimeType: header Content-Type, data: corpo lido pelo express.raw }.
+// Com outro Content-Type o express.raw não lê o corpo, e data não é Buffer.
+exports.avatarSchema = zod_1.z
+    .object({
+    // "image/jpeg; charset=binary" → "image/jpeg"
+    mimeType: zod_1.z.preprocess((value) => typeof value === "string"
+        ? value.split(";")[0].trim().toLowerCase()
+        : value, zod_1.z.enum(exports.avatarMimeTypes, { error: invalidImageMessage })),
+    data: zod_1.z
+        .instanceof(Buffer, { error: invalidImageMessage })
+        .refine((data) => data.length > 0, { error: invalidImageMessage }),
+})
+    .refine(({ mimeType, data }) => matchesSignature(mimeType, data), {
+    error: invalidImageMessage,
 });
