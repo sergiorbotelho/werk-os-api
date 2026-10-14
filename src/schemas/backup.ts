@@ -28,7 +28,7 @@ const money = z
 
 const text = (max: number) => z.string().max(max);
 
-export const backupUserSchema = z.object({
+export const backupUserSchema = z.strictObject({
   id: z.string().min(1),
   name: text(255),
   email: text(255),
@@ -41,7 +41,7 @@ export const backupUserSchema = z.object({
   update_at: date.nullable(),
 });
 
-export const backupUserAvatarSchema = z.object({
+export const backupUserAvatarSchema = z.strictObject({
   userId: z.string().min(1),
   data: z
     .base64()
@@ -51,7 +51,7 @@ export const backupUserAvatarSchema = z.object({
   updated_at: date,
 });
 
-export const backupClientSchema = z.object({
+export const backupClientSchema = z.strictObject({
   id: z.number().int().positive(),
   nome: text(255),
   telefone: text(20),
@@ -68,7 +68,7 @@ export const backupClientSchema = z.object({
   update_at: date.nullable(),
 });
 
-export const backupOsSchema = z.object({
+export const backupOsSchema = z.strictObject({
   id: z.number().int().positive(),
   contato: z.string(),
   modeloEquipamento: z.string(),
@@ -109,7 +109,7 @@ export type BackupColumnsCheck = [
 export const backupFileSchema = z.object({
   format: z.literal("werk-backup", { error: invalidBackupMessage }),
   version: z.literal(1, { error: "Versão de backup não suportada" }),
-  createdAt: z.string(),
+  createdAt: z.iso.datetime({ offset: true }),
   createdBy: z.string(),
   migration: z.string().nullable(),
   data: z.object({

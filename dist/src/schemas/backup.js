@@ -17,7 +17,7 @@ const money = zod_1.z
     .regex(/^-?\d{1,28}(\.\d{1,2})?$/)
     .nullable();
 const text = (max) => zod_1.z.string().max(max);
-exports.backupUserSchema = zod_1.z.object({
+exports.backupUserSchema = zod_1.z.strictObject({
     id: zod_1.z.string().min(1),
     name: text(255),
     email: text(255),
@@ -29,7 +29,7 @@ exports.backupUserSchema = zod_1.z.object({
     created_at: date.nullable(),
     update_at: date.nullable(),
 });
-exports.backupUserAvatarSchema = zod_1.z.object({
+exports.backupUserAvatarSchema = zod_1.z.strictObject({
     userId: zod_1.z.string().min(1),
     data: zod_1.z
         .base64()
@@ -38,7 +38,7 @@ exports.backupUserAvatarSchema = zod_1.z.object({
     mimeType: zod_1.z.enum(user_1.avatarMimeTypes),
     updated_at: date,
 });
-exports.backupClientSchema = zod_1.z.object({
+exports.backupClientSchema = zod_1.z.strictObject({
     id: zod_1.z.number().int().positive(),
     nome: text(255),
     telefone: text(20),
@@ -54,7 +54,7 @@ exports.backupClientSchema = zod_1.z.object({
     created_at: date.nullable(),
     update_at: date.nullable(),
 });
-exports.backupOsSchema = zod_1.z.object({
+exports.backupOsSchema = zod_1.z.strictObject({
     id: zod_1.z.number().int().positive(),
     contato: zod_1.z.string(),
     modeloEquipamento: zod_1.z.string(),
@@ -76,7 +76,7 @@ exports.backupOsSchema = zod_1.z.object({
 exports.backupFileSchema = zod_1.z.object({
     format: zod_1.z.literal("werk-backup", { error: exports.invalidBackupMessage }),
     version: zod_1.z.literal(1, { error: "Versão de backup não suportada" }),
-    createdAt: zod_1.z.string(),
+    createdAt: zod_1.z.iso.datetime({ offset: true }),
     createdBy: zod_1.z.string(),
     migration: zod_1.z.string().nullable(),
     data: zod_1.z.object({
