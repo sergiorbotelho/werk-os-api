@@ -296,7 +296,7 @@ rota → isAuthenticated → requireAdmin (rotas de admin) → controller → se
 
 O admin gera o backup na tela **Backup** do sistema (ou em `POST /backup`). O arquivo `.json.gz` contém todos os usuários (com as senhas criptografadas), as fotos, os clientes e as OS. Guarde-o em local seguro.
 
-A restauração (`POST /backup/restore`) **substitui todos os dados** pelos do arquivo, inclusive usuários e senhas. Ela funciona também num banco novo e vazio: aponte a API para o novo Postgres, deixe o deploy rodar as migrations e o seed, entre com o admin do seed e restaure o arquivo. O formato tem versão (`version: 1`). A API recusa arquivos de outra versão, corrompidos ou inconsistentes antes de apagar qualquer coisa.
+A restauração (`POST /backup/restore`) **substitui todos os dados** pelos do arquivo, inclusive usuários e senhas. Ela funciona também num banco novo e vazio: aponte a API para o novo Postgres, deixe o deploy rodar as migrations e o seed, entre com o admin do seed (`admin@werk.com.br` / `123456`), troque a senha temporária e restaure o arquivo. O formato tem versão (`version: 1`). A API recusa arquivos de outra versão, corrompidos ou inconsistentes antes de apagar qualquer coisa.
 
 O arquivo é limitado a 4 MB, porque a Vercel limita o corpo das requisições e respostas a 4,5 MB.
 

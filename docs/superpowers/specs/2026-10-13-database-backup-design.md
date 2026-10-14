@@ -1,7 +1,7 @@
 # Backup e restauração do banco de dados
 
 Data: 2026-10-13
-Status: em revisão
+Status: aprovada
 
 ## Objetivo
 
